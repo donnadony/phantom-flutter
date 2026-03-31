@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'dart:convert';
+
 import 'core/models/phantom_config_entry.dart';
 import 'core/models/phantom_localization_entry.dart';
 import 'core/models/phantom_log_item.dart';
@@ -32,17 +34,30 @@ class Phantom {
 
   // MARK: - Network Logging
 
+  static String _formatBody(dynamic body) {
+    if (body == null) return 'No body';
+    if (body is String) return body.isEmpty ? 'No body' : body;
+    if (body is Map || body is List) {
+      try {
+        return const JsonEncoder.withIndent('  ').convert(body);
+      } catch (_) {
+        return body.toString();
+      }
+    }
+    return body.toString();
+  }
+
   static void logRequest({
     required String method,
     required String url,
     String headers = 'No headers',
-    String body = 'No body',
+    dynamic body = 'No body',
   }) {
     PhantomNetworkLogger.instance.logRequest(
       method: method,
       url: url,
       headers: headers,
-      body: body,
+      body: _formatBody(body),
     );
   }
 
@@ -50,14 +65,14 @@ class Phantom {
     required String url,
     required int statusCode,
     String headers = 'No headers',
-    String body = '',
+    dynamic body = '',
     int? durationMs,
   }) {
     PhantomNetworkLogger.instance.logResponse(
       url: url,
       statusCode: statusCode,
       headers: headers,
-      body: body,
+      body: _formatBody(body),
       durationMs: durationMs,
     );
   }
@@ -66,20 +81,20 @@ class Phantom {
     required String method,
     required String url,
     String requestHeaders = 'No headers',
-    String requestBody = 'No body',
+    dynamic requestBody = 'No body',
     required int statusCode,
     String responseHeaders = 'No headers',
-    String responseBody = '',
+    dynamic responseBody = '',
     int? durationMs,
   }) {
     PhantomNetworkLogger.instance.completeRequest(
       method: method,
       url: url,
       requestHeaders: requestHeaders,
-      requestBody: requestBody,
+      requestBody: _formatBody(requestBody),
       statusCode: statusCode,
       responseHeaders: responseHeaders,
-      responseBody: responseBody,
+      responseBody: _formatBody(responseBody),
       durationMs: durationMs,
     );
   }
