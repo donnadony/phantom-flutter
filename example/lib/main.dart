@@ -48,6 +48,12 @@ class _HomePageState extends State<HomePage> {
     Phantom.registerConfig('Log Level', key: 'log_level', defaultValue: 'info', type: PhantomConfigType.picker, options: ['debug', 'info', 'warning', 'error'], group: 'General');
     Phantom.registerConfig('Timeout (seconds)', key: 'timeout', defaultValue: '30', group: 'Performance');
 
+    Phantom.registerLocalization(key: 'welcome', english: 'Welcome', spanish: 'Bienvenido', group: 'Home');
+    Phantom.registerLocalization(key: 'login', english: 'Log In', spanish: 'Iniciar Sesión', group: 'Auth');
+    Phantom.registerLocalization(key: 'logout', english: 'Log Out', spanish: 'Cerrar Sesión', group: 'Auth');
+    Phantom.registerLocalization(key: 'settings', english: 'Settings', spanish: 'Configuración', group: 'General');
+    Phantom.registerLocalization(key: 'profile', english: 'Profile', spanish: 'Perfil', group: 'General');
+
     Phantom.log(PhantomLogLevel.info, 'App started', tag: 'Lifecycle');
     Phantom.log(PhantomLogLevel.info, 'User session initialized', tag: 'Auth');
 

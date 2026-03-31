@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'core/models/phantom_config_entry.dart';
+import 'core/models/phantom_localization_entry.dart';
 import 'core/models/phantom_log_item.dart';
 import 'core/phantom_config.dart';
+import 'core/phantom_localizer.dart';
 import 'core/phantom_logger.dart';
 import 'core/phantom_mock_interceptor.dart';
 import 'core/phantom_network_logger.dart';
@@ -126,6 +128,30 @@ class Phantom {
 
   static Future<String?> config(String key) async {
     return PhantomConfig.instance.effectiveValue(key);
+  }
+
+  // MARK: - Localization
+
+  static void registerLocalization({
+    required String key,
+    required String english,
+    required String spanish,
+    String group = 'General',
+  }) {
+    PhantomLocalizer.instance.register(
+      key: key,
+      english: english,
+      spanish: spanish,
+      group: group,
+    );
+  }
+
+  static Future<void> setLanguage(PhantomLanguage language) async {
+    await PhantomLocalizer.instance.setLanguage(language);
+  }
+
+  static String localized(String key, {String? group}) {
+    return PhantomLocalizer.instance.localized(key, group: group);
   }
 
   // MARK: - UI

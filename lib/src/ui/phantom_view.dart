@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/phantom_theme.dart';
 import 'config/phantom_config_page.dart';
+import 'device_info/phantom_device_info_page.dart';
+import 'localization/phantom_localization_page.dart';
 import 'logs/phantom_logs_page.dart';
 import 'mock/phantom_mock_list_page.dart';
 import 'network/phantom_network_page.dart';
+import 'shared_prefs/phantom_shared_prefs_page.dart';
 
 class PhantomView extends StatelessWidget {
   final VoidCallback? onClose;
@@ -51,9 +54,9 @@ class PhantomViewBody extends StatelessWidget {
       _MenuItem(title: 'Network', icon: Icons.language, destination: const PhantomNetworkPage()),
       _MenuItem(title: 'Mock Services', icon: Icons.sensors, destination: const PhantomMockListPage()),
       _MenuItem(title: 'Configuration', icon: Icons.settings_outlined, destination: const PhantomConfigPage()),
-      _MenuItem(title: 'Device Info', icon: Icons.phone_iphone, destination: null),
-      _MenuItem(title: 'SharedPreferences', icon: Icons.storage_outlined, destination: null),
-      _MenuItem(title: 'Localization', icon: Icons.public, destination: null),
+      _MenuItem(title: 'Device Info', icon: Icons.phone_iphone, destination: const PhantomDeviceInfoPage()),
+      _MenuItem(title: 'SharedPreferences', icon: Icons.storage_outlined, destination: const PhantomSharedPrefsPage()),
+      _MenuItem(title: 'Localization', icon: Icons.public, destination: const PhantomLocalizationPage()),
     ];
 
     return SingleChildScrollView(
