@@ -5,7 +5,9 @@ import 'logs/phantom_logs_page.dart';
 import 'network/phantom_network_page.dart';
 
 class PhantomView extends StatelessWidget {
-  const PhantomView({super.key});
+  final VoidCallback? onClose;
+
+  const PhantomView({super.key, this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -25,67 +27,75 @@ class PhantomView extends StatelessWidget {
         ),
         leading: IconButton(
           icon: Icon(Icons.close, color: theme.onBackgroundVariant),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: onClose ?? () => Navigator.of(context).pop(),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      body: PhantomViewBody(onClose: onClose),
+    );
+  }
+}
+
+class PhantomViewBody extends StatelessWidget {
+  final VoidCallback? onClose;
+
+  const PhantomViewBody({super.key, this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = PhantomThemeProvider.of(context);
+
+    final items = [
+      _MenuItem(title: 'Logs', icon: Icons.description_outlined, destination: const PhantomLogsPage()),
+      _MenuItem(title: 'Network', icon: Icons.language, destination: const PhantomNetworkPage()),
+      _MenuItem(title: 'Mock Services', icon: Icons.sensors, destination: null),
+      _MenuItem(title: 'Configuration', icon: Icons.settings_outlined, destination: null),
+      _MenuItem(title: 'Device Info', icon: Icons.phone_iphone, destination: null),
+      _MenuItem(title: 'SharedPreferences', icon: Icons.storage_outlined, destination: null),
+      _MenuItem(title: 'Localization', icon: Icons.public, destination: null),
+    ];
+
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          _phantomRow(
-            context,
-            title: 'Logs',
-            icon: Icons.article_outlined,
-            destination: const PhantomLogsPage(),
-            theme: theme,
-          ),
-          const SizedBox(height: 8),
-          _phantomRow(
-            context,
-            title: 'Network',
-            icon: Icons.wifi_outlined,
-            destination: const PhantomNetworkPage(),
-            theme: theme,
-          ),
+          for (final item in items) ...[
+            _phantomRow(context, item: item, theme: theme),
+            Divider(height: 1, color: theme.outlineVariant, indent: 16, endIndent: 16),
+          ],
         ],
       ),
     );
   }
 
-  Widget _phantomRow(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required Widget destination,
-    required PhantomTheme theme,
-  }) {
+  Widget _phantomRow(BuildContext context, {required _MenuItem item, required PhantomTheme theme}) {
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => PhantomThemeProvider(
-              theme: theme,
-              child: destination,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: theme.surface,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: theme.outlineVariant),
-        ),
+      behavior: HitTestBehavior.opaque,
+      onTap: item.destination != null
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => PhantomThemeProvider(
+                    theme: theme,
+                    child: item.destination!,
+                  ),
+                ),
+              );
+            }
+          : null,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
-            Icon(icon, color: theme.tint, size: 22),
+            SizedBox(
+              width: 24,
+              child: Icon(item.icon, color: theme.primary, size: 20),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                title,
+                item.title,
                 style: TextStyle(
-                  color: theme.onBackground,
-                  fontSize: 15,
+                  color: item.destination != null ? theme.onBackground : theme.onBackgroundVariant,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -96,4 +106,12 @@ class PhantomView extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MenuItem {
+  final String title;
+  final IconData icon;
+  final Widget? destination;
+
+  const _MenuItem({required this.title, required this.icon, this.destination});
 }

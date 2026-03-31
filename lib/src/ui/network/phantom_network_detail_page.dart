@@ -5,6 +5,7 @@ import '../../core/models/phantom_network_item.dart';
 import '../../theme/phantom_theme.dart';
 import '../../utils/curl_builder.dart';
 import '../../utils/json_formatter.dart';
+import 'phantom_json_tree_view.dart';
 
 class PhantomNetworkDetailPage extends StatefulWidget {
   final PhantomNetworkItem item;
@@ -20,7 +21,7 @@ enum _DetailTab { request, response, headers }
 
 class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
   _DetailTab _selectedTab = _DetailTab.response;
-  bool _showFormatted = true;
+  final bool _showFormatted = true;
   String? _copiedMessage;
 
   @override
@@ -34,7 +35,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         backgroundColor: theme.background,
         foregroundColor: theme.onBackground,
         title: Text(
-          item.methodType,
+          '${item.methodType} ${item.statusCode != null ? item.statusCode.toString() : ''}',
           style: TextStyle(
               color: theme.onBackground, fontWeight: FontWeight.bold),
         ),
@@ -114,8 +115,13 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
   }
 
   Widget _buildTabBar(PhantomTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: theme.inputBackground,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: _DetailTab.values.map((tab) {
           final selected = _selectedTab == tab;
@@ -125,17 +131,16 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected ? theme.surfaceVariant : Colors.transparent,
+                  color: selected ? theme.onBackground : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   tab.name[0].toUpperCase() + tab.name.substring(1),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color:
-                        selected ? theme.onBackground : theme.onBackgroundVariant,
+                    color: selected ? theme.background : theme.onBackgroundVariant,
                     fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -162,10 +167,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         break;
     }
 
-    final displayText =
-        (_showFormatted && _selectedTab != _DetailTab.headers)
-            ? (prettyPrintJson(text) ?? text)
-            : text;
+    final isJson = _selectedTab != _DetailTab.headers && _isJson(text);
 
     return Container(
       width: double.infinity,
@@ -175,75 +177,81 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         color: theme.surface,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SingleChildScrollView(
-            child: Text(
-              displayText,
-              style: TextStyle(
-                color: theme.onBackground,
-                fontSize: 12,
-                fontFamily: 'monospace',
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _copyText(text),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.copy_rounded, color: theme.info, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      _copiedMessage ?? 'Copy',
+                      style: TextStyle(
+                        color: theme.info,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: Row(
-              children: [
-                if (_selectedTab != _DetailTab.headers) ...[
-                  _toggleButton(
-                    label: _showFormatted ? 'Raw' : 'Format',
-                    theme: theme,
-                    onTap: () =>
-                        setState(() => _showFormatted = !_showFormatted),
+          const SizedBox(height: 8),
+          Expanded(
+            child: _showFormatted && isJson
+                ? PhantomJsonTreeView(jsonString: text)
+                : SingleChildScrollView(
+                    child: Text(
+                      prettyPrintJson(text) ?? text,
+                      style: TextStyle(
+                        color: theme.onBackground,
+                        fontSize: 12,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                ],
-                _toggleButton(
-                  label: _copiedMessage ?? 'Copy',
-                  theme: theme,
-                  onTap: () => _copyText(text),
-                ),
-              ],
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _toggleButton({
-    required String label,
-    required PhantomTheme theme,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        decoration: BoxDecoration(
-          color: theme.surfaceVariant,
-          borderRadius: BorderRadius.circular(6),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: theme.info,
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildActions(PhantomNetworkItem item, PhantomTheme theme) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Row(
         children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: theme.info,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Mock this',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: theme.onPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: GestureDetector(
               onTap: () {
@@ -272,6 +280,13 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         ],
       ),
     );
+  }
+
+  bool _isJson(String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return false;
+    return (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+        (trimmed.startsWith('[') && trimmed.endsWith(']'));
   }
 
   void _copyText(String text) {

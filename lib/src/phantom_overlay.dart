@@ -22,7 +22,8 @@ class PhantomOverlay extends StatefulWidget {
 
 class _PhantomOverlayState extends State<PhantomOverlay> {
   Offset _buttonPosition = const Offset(16, 100);
-  bool _isDragging = false;
+  bool _hasDragged = false;
+  bool _phantomOpen = false;
 
   @override
   void initState() {
@@ -42,49 +43,73 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
       child: Stack(
         children: [
           widget.child,
-          Positioned(
-            left: _buttonPosition.dx,
-            top: _buttonPosition.dy,
-            child: GestureDetector(
-              onPanStart: (_) => _isDragging = true,
-              onPanUpdate: (details) {
-                setState(() {
-                  _buttonPosition += details.delta;
-                });
-              },
-              onPanEnd: (_) {
-                _isDragging = false;
-                _snapToEdge(context);
-              },
-              onTap: () {
-                if (!_isDragging) _openPhantom(context);
-              },
-              child: _FloatingButton(theme: widget.theme ?? Phantom.theme),
+          if (!_phantomOpen)
+            Positioned(
+              left: _buttonPosition.dx,
+              top: _buttonPosition.dy,
+              child: GestureDetector(
+                onPanStart: (_) {
+                  _hasDragged = false;
+                },
+                onPanUpdate: (details) {
+                  _hasDragged = true;
+                  setState(() {
+                    _buttonPosition += details.delta;
+                  });
+                },
+                onPanEnd: (_) {
+                  if (_hasDragged) {
+                    _snapToEdge();
+                  } else {
+                    _openPhantom();
+                  }
+                },
+                onTap: _openPhantom,
+                child: _FloatingButton(theme: widget.theme ?? Phantom.theme),
+              ),
             ),
-          ),
+          if (_phantomOpen)
+            Positioned.fill(
+              child: _PhantomApp(
+                theme: widget.theme ?? Phantom.theme,
+                onClose: () => setState(() => _phantomOpen = false),
+              ),
+            ),
         ],
       ),
     );
   }
 
-  void _snapToEdge(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final midX = screenWidth / 2;
+  void _snapToEdge() {
+    final size = MediaQuery.of(context).size;
+    final midX = size.width / 2;
     setState(() {
       _buttonPosition = Offset(
-        _buttonPosition.dx < midX ? 16 : screenWidth - 60,
-        _buttonPosition.dy.clamp(50, MediaQuery.of(context).size.height - 100),
+        _buttonPosition.dx < midX ? 16 : size.width - 60,
+        _buttonPosition.dy.clamp(50.0, size.height - 100),
       );
     });
   }
 
-  void _openPhantom(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute(
-        builder: (_) => PhantomThemeProvider(
-          theme: widget.theme ?? Phantom.theme,
-          child: const PhantomView(),
-        ),
+  void _openPhantom() {
+    setState(() => _phantomOpen = true);
+  }
+}
+
+class _PhantomApp extends StatelessWidget {
+  final PhantomTheme theme;
+  final VoidCallback onClose;
+
+  const _PhantomApp({required this.theme, required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return PhantomThemeProvider(
+      theme: theme,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(),
+        home: PhantomView(onClose: onClose),
       ),
     );
   }

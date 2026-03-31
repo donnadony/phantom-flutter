@@ -3,9 +3,7 @@ import '../core/models/phantom_network_item.dart';
 String buildCurlCommand(PhantomNetworkItem item) {
   final buffer = StringBuffer('curl');
 
-  if (item.methodType != 'GET') {
-    buffer.write(' -X ${item.methodType}');
-  }
+  buffer.write(' -X ${item.methodType}');
 
   if (item.url != null) {
     buffer.write(" '${item.url}'");
