@@ -6,6 +6,28 @@ A cross-platform debug toolkit for Flutter apps. Inspect logs, network requests,
 [![Dart](https://img.shields.io/badge/Dart-3.9%2B-blue)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
+## Screenshots
+
+| Home | Logs | Network |
+|:---:|:---:|:---:|
+| <img src="Screenshots/home.png" width="200" /> | <img src="Screenshots/logs.png" width="200" /> | <img src="Screenshots/network.png" width="200" /> |
+| Main debug panel with access to all features | Filter logs by level (Info, Warning, Error) and search by message or tag | Inspect HTTP requests with status codes, duration, and response size |
+
+| Network Detail | Mock This | Status Code Picker |
+|:---:|:---:|:---:|
+| <img src="Screenshots/network_detail.png" width="200" /> | <img src="Screenshots/mock_this.png" width="200" /> | <img src="Screenshots/status_code_picker.png" width="200" /> |
+| View request/response JSON, copy cURL, or create mock | Pre-filled mock editor from any captured request | Searchable picker with common codes first, grouped by category |
+
+| Mock Services | Mock Editor | Configuration |
+|:---:|:---:|:---:|
+| <img src="Screenshots/mock_list.png" width="200" /> | <img src="Screenshots/mock_edit.png" width="200" /> | <img src="Screenshots/configuration.png" width="200" /> |
+| List of mock rules with enable/disable toggles | Edit URL pattern, HTTP method, status code, and JSON body | Text, toggle, and picker config types with group filtering |
+
+| Device Info | SharedPreferences | Localization |
+|:---:|:---:|:---:|
+| <img src="Screenshots/device_info.png" width="200" /> | <img src="Screenshots/shared_prefs.png" width="200" /> | <img src="Screenshots/localization.png" width="200" /> |
+| App version, device model, OS, screen metrics — tap to copy | Browse, search, edit, add, and delete stored preferences | Bilingual string viewer with EN/ES language picker and group filter |
+
 ## Features
 
 - **Logs** — App-level logging with levels (info, warning, error) and tag filtering
