@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -324,8 +326,16 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
   bool _isJson(String text) {
     final trimmed = text.trim();
     if (trimmed.isEmpty) return false;
-    return (trimmed.startsWith('{') && trimmed.endsWith('}')) ||
-        (trimmed.startsWith('[') && trimmed.endsWith(']'));
+    if (!((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
+        (trimmed.startsWith('[') && trimmed.endsWith(']')))) {
+      return false;
+    }
+    try {
+      jsonDecode(trimmed);
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   void _copyText(String text) {
