@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/models/phantom_mock_rule.dart';
 import '../../core/models/phantom_network_item.dart';
+import '../../core/phantom_mock_interceptor.dart';
 import '../../theme/phantom_theme.dart';
 import '../../utils/curl_builder.dart';
 import '../../utils/json_formatter.dart';
+import '../mock/phantom_mock_edit_page.dart';
 import 'phantom_json_tree_view.dart';
 
 class PhantomNetworkDetailPage extends StatefulWidget {
@@ -232,7 +235,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () {},
+              onTap: () => _createMock(item, theme),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 decoration: BoxDecoration(
@@ -278,6 +281,42 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _createMock(PhantomNetworkItem item, PhantomTheme theme) {
+    final uri = item.url != null ? Uri.tryParse(item.url!) : null;
+    final path = uri?.path ?? '';
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    final responseId = '${id}_r';
+    final rule = PhantomMockRule(
+      id: id,
+      urlPattern: path,
+      httpMethod: item.methodType,
+      responses: [
+        PhantomMockResponse(
+          id: responseId,
+          name: 'Response 1',
+          httpMethod: item.methodType,
+          statusCode: item.statusCode ?? 200,
+          responseBody: item.responseBody,
+        ),
+      ],
+      activeResponseId: responseId,
+      ruleDescription: 'Mock ${path.split('/').last}',
+    );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PhantomThemeProvider(
+          theme: theme,
+          child: PhantomMockEditPage(
+            existingRule: rule,
+            onSave: (savedRule) {
+              PhantomMockInterceptor.instance.addRule(savedRule);
+            },
+          ),
+        ),
       ),
     );
   }

@@ -30,7 +30,14 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   int _statusCode = 200;
 
   static const _httpMethods = ['ANY', 'GET', 'POST', 'PUT', 'DELETE'];
-  static const _statusCodes = [200, 201, 204, 301, 400, 401, 403, 404, 500, 502, 503];
+  static const _statusCodes = <int, String>{
+    100: 'Continue', 101: 'Switching Protocols', 102: 'Processing', 103: 'Early Hints',
+    200: 'OK', 201: 'Created', 202: 'Accepted', 204: 'No Content', 206: 'Partial Content', 207: 'Multi-Status',
+    301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified', 307: 'Temporary Redirect', 308: 'Permanent Redirect',
+    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 405: 'Method Not Allowed',
+    408: 'Request Timeout', 409: 'Conflict', 422: 'Unprocessable Entity', 429: 'Too Many Requests',
+    500: 'Internal Server Error', 501: 'Not Implemented', 502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout',
+  };
 
   bool get _isEditing => widget.existingRule != null;
 
@@ -69,9 +76,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
       appBar: AppBar(
         backgroundColor: theme.background,
         foregroundColor: theme.onBackground,
-        leading: TextButton(
+        leading: IconButton(
+          icon: Icon(Icons.close, color: theme.onBackgroundVariant),
           onPressed: () => Navigator.of(context).pop(),
-          child: Text('Cancel', style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14)),
         ),
         title: Text(
           _isEditing ? 'Edit Mock Rule' : 'New Mock Rule',
@@ -185,31 +192,77 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   }
 
   Widget _statusCodePicker(PhantomTheme theme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: theme.surface,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: DropdownButton<int>(
-        value: _statusCode,
-        isExpanded: true,
-        dropdownColor: theme.surface,
-        underline: const SizedBox.shrink(),
-        style: TextStyle(color: theme.onBackground, fontSize: 14),
-        items: _statusCodes.map((code) {
-          return DropdownMenuItem(
-            value: code,
-            child: Text(
-              '$code - ${_statusLabel(code)}',
-              style: TextStyle(color: theme.statusColor(code)),
+    return GestureDetector(
+      onTap: () => _showStatusCodeSheet(theme),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: theme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          children: [
+            Text(
+              '$_statusCode - ${_statusCodes[_statusCode] ?? ''}',
+              style: TextStyle(color: theme.statusColor(_statusCode), fontSize: 14),
             ),
-          );
-        }).toList(),
-        onChanged: (v) {
-          if (v != null) setState(() => _statusCode = v);
-        },
+            const Spacer(),
+            Icon(Icons.expand_more, color: theme.onBackgroundVariant, size: 20),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showStatusCodeSheet(PhantomTheme theme) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return SizedBox(
+          height: 400,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Status Code',
+                  style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  children: _statusCodes.entries.map((entry) {
+                    final selected = _statusCode == entry.key;
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        setState(() => _statusCode = entry.key);
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        color: selected ? theme.surfaceVariant : Colors.transparent,
+                        child: Text(
+                          '${entry.key} - ${entry.value}',
+                          style: TextStyle(
+                            color: theme.statusColor(entry.key),
+                            fontSize: 14,
+                            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -319,13 +372,4 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
     } catch (_) {}
   }
 
-  String _statusLabel(int code) {
-    const labels = {
-      200: 'OK', 201: 'Created', 204: 'No Content',
-      301: 'Moved', 400: 'Bad Request', 401: 'Unauthorized',
-      403: 'Forbidden', 404: 'Not Found', 500: 'Server Error',
-      502: 'Bad Gateway', 503: 'Unavailable',
-    };
-    return labels[code] ?? '';
-  }
 }
