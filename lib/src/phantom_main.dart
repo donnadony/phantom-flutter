@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import 'core/models/phantom_config_entry.dart';
 import 'core/models/phantom_log_item.dart';
+import 'core/phantom_config.dart';
 import 'core/phantom_logger.dart';
 import 'core/phantom_mock_interceptor.dart';
 import 'core/phantom_network_logger.dart';
@@ -100,6 +102,30 @@ class Phantom {
 
   static Future<void> loadMocks() async {
     await PhantomMockInterceptor.instance.loadRules();
+  }
+
+  // MARK: - Configuration
+
+  static void registerConfig(
+    String label, {
+    required String key,
+    required String defaultValue,
+    PhantomConfigType type = PhantomConfigType.text,
+    List<String> options = const [],
+    String group = 'General',
+  }) {
+    PhantomConfig.instance.register(
+      label: label,
+      key: key,
+      defaultValue: defaultValue,
+      type: type,
+      options: options,
+      group: group,
+    );
+  }
+
+  static Future<String?> config(String key) async {
+    return PhantomConfig.instance.effectiveValue(key);
   }
 
   // MARK: - UI

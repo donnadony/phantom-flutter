@@ -43,6 +43,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _seedSampleData() {
+    Phantom.registerConfig('API Base URL', key: 'api_base_url', defaultValue: 'https://jsonplaceholder.typicode.com');
+    Phantom.registerConfig('Enable Cache', key: 'enable_cache', defaultValue: 'true', type: PhantomConfigType.toggle, group: 'Performance');
+    Phantom.registerConfig('Log Level', key: 'log_level', defaultValue: 'info', type: PhantomConfigType.picker, options: ['debug', 'info', 'warning', 'error'], group: 'General');
+    Phantom.registerConfig('Timeout (seconds)', key: 'timeout', defaultValue: '30', group: 'Performance');
+
     Phantom.log(PhantomLogLevel.info, 'App started', tag: 'Lifecycle');
     Phantom.log(PhantomLogLevel.info, 'User session initialized', tag: 'Auth');
 

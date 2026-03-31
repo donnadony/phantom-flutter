@@ -6,4 +6,6 @@ export 'src/core/models/phantom_mock_rule.dart';
 export 'src/core/phantom_logger.dart';
 export 'src/core/phantom_network_logger.dart';
 export 'src/core/phantom_mock_interceptor.dart';
+export 'src/core/phantom_config.dart';
+export 'src/core/models/phantom_config_entry.dart';
 export 'src/theme/phantom_theme.dart';
