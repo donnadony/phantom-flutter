@@ -47,16 +47,28 @@ class Phantom {
     return body.toString();
   }
 
+  static String _formatHeaders(dynamic headers) {
+    if (headers == null) return 'No headers';
+    if (headers is String) return headers.isEmpty ? 'No headers' : headers;
+    if (headers is Map) {
+      return headers.entries.map((e) {
+        final value = e.value is List ? (e.value as List).join(', ') : e.value;
+        return '${e.key}: $value';
+      }).join('\n');
+    }
+    return headers.toString();
+  }
+
   static void logRequest({
     required String method,
     required String url,
-    String headers = 'No headers',
+    dynamic headers = 'No headers',
     dynamic body = 'No body',
   }) {
     PhantomNetworkLogger.instance.logRequest(
       method: method,
       url: url,
-      headers: headers,
+      headers: _formatHeaders(headers),
       body: _formatBody(body),
     );
   }
@@ -64,14 +76,14 @@ class Phantom {
   static void logResponse({
     required String url,
     required int statusCode,
-    String headers = 'No headers',
+    dynamic headers = 'No headers',
     dynamic body = '',
     int? durationMs,
   }) {
     PhantomNetworkLogger.instance.logResponse(
       url: url,
       statusCode: statusCode,
-      headers: headers,
+      headers: _formatHeaders(headers),
       body: _formatBody(body),
       durationMs: durationMs,
     );
@@ -80,20 +92,20 @@ class Phantom {
   static void completeRequest({
     required String method,
     required String url,
-    String requestHeaders = 'No headers',
+    dynamic requestHeaders = 'No headers',
     dynamic requestBody = 'No body',
     required int statusCode,
-    String responseHeaders = 'No headers',
+    dynamic responseHeaders = 'No headers',
     dynamic responseBody = '',
     int? durationMs,
   }) {
     PhantomNetworkLogger.instance.completeRequest(
       method: method,
       url: url,
-      requestHeaders: requestHeaders,
+      requestHeaders: _formatHeaders(requestHeaders),
       requestBody: _formatBody(requestBody),
       statusCode: statusCode,
-      responseHeaders: responseHeaders,
+      responseHeaders: _formatHeaders(responseHeaders),
       responseBody: _formatBody(responseBody),
       durationMs: durationMs,
     );
