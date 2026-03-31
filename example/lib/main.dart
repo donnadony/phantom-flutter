@@ -84,6 +84,25 @@ class _HomePageState extends State<HomePage> {
       durationMs: 95,
     );
 
+    // Test: passing Map directly (should auto JSON-encode)
+    Phantom.completeRequest(
+      method: 'GET',
+      url: 'https://qavecinopuntual.msb.gob.pe/v1/categoria/listar',
+      statusCode: 200,
+      responseHeaders: {'content-type': ['application/json'], 'server': ['Apache/2.4.41']},
+      responseBody: {
+        'statusCode': 200,
+        'success': true,
+        'message': 'Listado de categorias',
+        'data': [
+          {'avatar': 'mdi mdi-silverware-fork-knife', '_id': '662050b3f7a2a9718d5f7053', 'nombre': 'Restaurante'},
+          {'avatar': 'mdi mdi-hospital-box', '_id': '662050bef7a2a9718d5f7056', 'nombre': 'Salud'},
+          {'avatar': 'mdi mdi-school', '_id': '662050caf7a2a9718d5f7059', 'nombre': 'Educacion'},
+        ],
+      },
+      durationMs: 34,
+    );
+
     Phantom.log(PhantomLogLevel.error, 'Order 999 not found', tag: 'Network');
     Phantom.log(PhantomLogLevel.warning, 'Cache expired, refreshing...', tag: 'Cache');
   }

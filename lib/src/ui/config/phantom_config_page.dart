@@ -215,29 +215,74 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
           ],
         );
       case PhantomConfigType.picker:
-        return Wrap(
-          spacing: 8,
-          children: entry.options.map((option) {
-            final selected = (currentValue ?? entry.defaultValue) == option;
-            return GestureDetector(
-              onTap: () => _config.setValue(entry.key, option),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: selected ? theme.primary : theme.surfaceVariant,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  option,
-                  style: TextStyle(
-                    color: selected ? theme.onPrimary : theme.onBackground,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
+        final selected = currentValue ?? entry.defaultValue;
+        return GestureDetector(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: theme.background,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              builder: (ctx) => SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(entry.label, style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ),
+                    ...entry.options.map((option) {
+                      final isSelected = selected == option;
+                      return GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          _config.setValue(entry.key, option);
+                          Navigator.pop(ctx);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          color: isSelected ? theme.surfaceVariant : Colors.transparent,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(option, style: TextStyle(
+                                  color: theme.onBackground,
+                                  fontSize: 14,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                )),
+                              ),
+                              if (isSelected) Icon(Icons.check, color: theme.success, size: 18),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: 16),
+                  ],
                 ),
               ),
             );
-          }).toList(),
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: theme.inputBackground,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    selected,
+                    style: TextStyle(color: theme.onBackground, fontSize: 14, fontFamily: 'monospace'),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.expand_more, color: theme.onBackgroundVariant, size: 20),
+              ],
+            ),
+          ),
         );
       case PhantomConfigType.text:
         return Container(
