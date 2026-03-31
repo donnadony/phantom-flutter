@@ -1,0 +1,22 @@
+name: phantom_flutter
+description: A cross-platform debug toolkit for Flutter apps. Inspect logs, network requests, mock responses, config overrides, and more.
+version: 0.0.1
+homepage: https://github.com/donnadony/phantom-flutter
+
+environment:
+  sdk: ^3.9.2
+  flutter: ">=3.29.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.5.0
+  package_info_plus: ^8.3.0
+  device_info_plus: ^11.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
