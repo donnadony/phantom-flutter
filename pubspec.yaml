@@ -15,9 +15,15 @@ dependencies:
   # one-line dependency into a version-solving refusal. Only PackageInfo
   # .fromPlatform() and DeviceInfoPlugin().iosInfo/.androidInfo are used, and
   # both have been stable across these majors.
+  #
+  # device_info_plus must be allowed up to 13.x specifically: 11.x and 12.x pin
+  # win32 ^5, while package_info_plus 10.x pins win32 ^6, so capping below 13
+  # makes the two plugins here unresolvable together in any app on a current
+  # package_info_plus. win32 is unused on iOS and Android, but pub solves for
+  # every platform regardless.
   shared_preferences: '>=2.5.0 <3.0.0'
   package_info_plus: '>=8.3.0 <12.0.0'
-  device_info_plus: '>=11.3.0 <13.0.0'
+  device_info_plus: '>=11.3.0 <14.0.0'
 
 dev_dependencies:
   flutter_test:
