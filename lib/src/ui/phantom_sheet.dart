@@ -67,6 +67,10 @@ class _PhantomSheetState extends State<PhantomSheet> {
   late double _size = widget.initialSize;
   bool _dragging = false;
 
+  /// Gap left between the status bar and the sheet's top edge at full height,
+  /// matching the sliver of the presenting screen an iOS sheet leaves visible.
+  static const _topGap = 10.0;
+
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
@@ -74,7 +78,13 @@ class _PhantomSheetState extends State<PhantomSheet> {
     // The panel is anchored to the bottom, so an open keyboard would sit on
     // top of it. Lift it by the inset and cap its height to what is left.
     final keyboard = media.viewInsets.bottom;
-    final height = math.min(maxHeight * _size, maxHeight - keyboard);
+    // An iOS sheet's tallest detent stops below the status bar rather than
+    // going edge to edge: the screen behind stays visible, the rounded corners
+    // and the grabber stay clear of the notch, and nothing inside the panel
+    // has to dodge the system clock.
+    final ceiling = media.padding.top + _topGap;
+    final available = math.max(0.0, maxHeight - keyboard - ceiling);
+    final height = math.min(maxHeight * _size, available);
 
     return Stack(
       children: [
