@@ -46,12 +46,22 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           'Configuration',
-          style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => _config.resetAll(),
-            child: Text('Reset All', style: TextStyle(color: theme.error, fontWeight: FontWeight.w600, fontSize: 14)),
+            child: Text(
+              'Reset All',
+              style: TextStyle(
+                color: theme.error,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
           ),
         ],
       ),
@@ -71,11 +81,19 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.settings_outlined, color: theme.onBackgroundVariant, size: 48),
+          Icon(
+            Icons.settings_outlined,
+            color: theme.onBackgroundVariant,
+            size: 48,
+          ),
           const SizedBox(height: 16),
           Text(
             'No configuration entries',
-            style: TextStyle(color: theme.onBackground, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: theme.onBackground,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -95,14 +113,31 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          _groupChip('All', _selectedGroup == null, theme, () => setState(() => _selectedGroup = null)),
-          ...groups.map((g) => _groupChip(g, _selectedGroup == g, theme, () => setState(() => _selectedGroup = g))),
+          _groupChip(
+            'All',
+            _selectedGroup == null,
+            theme,
+            () => setState(() => _selectedGroup = null),
+          ),
+          ...groups.map(
+            (g) => _groupChip(
+              g,
+              _selectedGroup == g,
+              theme,
+              () => setState(() => _selectedGroup = g),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _groupChip(String label, bool selected, PhantomTheme theme, VoidCallback onTap) {
+  Widget _groupChip(
+    String label,
+    bool selected,
+    PhantomTheme theme,
+    VoidCallback onTap,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
@@ -158,19 +193,30 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
                   Expanded(
                     child: Text(
                       entry.label,
-                      style: TextStyle(color: theme.onBackground, fontSize: 14, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: theme.onBackground,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   if (isModified)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: theme.warning.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         'Modified',
-                        style: TextStyle(color: theme.warning, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: theme.warning,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                 ],
@@ -178,7 +224,11 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
               const SizedBox(height: 4),
               Text(
                 'Default: ${entry.defaultValue}',
-                style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12, fontFamily: 'monospace'),
+                style: TextStyle(
+                  color: theme.onBackgroundVariant,
+                  fontSize: 12,
+                  fontFamily: 'monospace',
+                ),
               ),
               const SizedBox(height: 8),
               _buildEditor(entry, overrideValue, theme),
@@ -188,7 +238,11 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
                   onTap: () => _config.resetValue(entry.key),
                   child: Text(
                     'Reset to Default',
-                    style: TextStyle(color: theme.error, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: theme.error,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],
@@ -199,18 +253,26 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
     );
   }
 
-  Widget _buildEditor(PhantomConfigEntry entry, String? currentValue, PhantomTheme theme) {
+  Widget _buildEditor(
+    PhantomConfigEntry entry,
+    String? currentValue,
+    PhantomTheme theme,
+  ) {
     switch (entry.type) {
       case PhantomConfigType.toggle:
         final isOn = (currentValue ?? entry.defaultValue) == 'true';
         return Row(
           children: [
-            Text('Enabled', style: TextStyle(color: theme.onBackgroundVariant, fontSize: 13)),
+            Text(
+              'Enabled',
+              style: TextStyle(color: theme.onBackgroundVariant, fontSize: 13),
+            ),
             const Spacer(),
             Switch.adaptive(
               value: isOn,
               activeTrackColor: theme.success,
-              onChanged: (v) => _config.setValue(entry.key, v ? 'true' : 'false'),
+              onChanged: (v) =>
+                  _config.setValue(entry.key, v ? 'true' : 'false'),
             ),
           ],
         );
@@ -230,7 +292,14 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(16),
-                      child: Text(entry.label, style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        entry.label,
+                        style: TextStyle(
+                          color: theme.onBackground,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     ...entry.options.map((option) {
                       final isSelected = selected == option;
@@ -241,18 +310,33 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
                           Navigator.pop(ctx);
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          color: isSelected ? theme.surfaceVariant : Colors.transparent,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          color: isSelected
+                              ? theme.surfaceVariant
+                              : Colors.transparent,
                           child: Row(
                             children: [
                               Expanded(
-                                child: Text(option, style: TextStyle(
-                                  color: theme.onBackground,
-                                  fontSize: 14,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                )),
+                                child: Text(
+                                  option,
+                                  style: TextStyle(
+                                    color: theme.onBackground,
+                                    fontSize: 14,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
                               ),
-                              if (isSelected) Icon(Icons.check, color: theme.success, size: 18),
+                              if (isSelected)
+                                Icon(
+                                  Icons.check,
+                                  color: theme.success,
+                                  size: 18,
+                                ),
                             ],
                           ),
                         ),
@@ -275,11 +359,19 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
                 Expanded(
                   child: Text(
                     selected,
-                    style: TextStyle(color: theme.onBackground, fontSize: 14, fontFamily: 'monospace'),
+                    style: TextStyle(
+                      color: theme.onBackground,
+                      fontSize: 14,
+                      fontFamily: 'monospace',
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.expand_more, color: theme.onBackgroundVariant, size: 20),
+                Icon(
+                  Icons.expand_more,
+                  color: theme.onBackgroundVariant,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -293,7 +385,11 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
           ),
           child: TextField(
             controller: TextEditingController(text: currentValue ?? ''),
-            style: TextStyle(color: theme.onBackground, fontSize: 13, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: theme.onBackground,
+              fontSize: 13,
+              fontFamily: 'monospace',
+            ),
             decoration: InputDecoration(
               hintText: entry.defaultValue,
               hintStyle: TextStyle(color: theme.onBackgroundVariant),

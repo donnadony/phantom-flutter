@@ -8,7 +8,8 @@ class PhantomLocalizationPage extends StatefulWidget {
   const PhantomLocalizationPage({super.key});
 
   @override
-  State<PhantomLocalizationPage> createState() => _PhantomLocalizationPageState();
+  State<PhantomLocalizationPage> createState() =>
+      _PhantomLocalizationPageState();
 }
 
 class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
@@ -36,10 +37,14 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
         : _localizer.entries;
     if (_searchText.isNotEmpty) {
       final q = _searchText.toLowerCase();
-      list = list.where((e) =>
-          e.key.toLowerCase().contains(q) ||
-          e.english.toLowerCase().contains(q) ||
-          e.spanish.toLowerCase().contains(q)).toList();
+      list = list
+          .where(
+            (e) =>
+                e.key.toLowerCase().contains(q) ||
+                e.english.toLowerCase().contains(q) ||
+                e.spanish.toLowerCase().contains(q),
+          )
+          .toList();
     }
     return list;
   }
@@ -55,7 +60,13 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
       appBar: AppBar(
         backgroundColor: theme.background,
         foregroundColor: theme.onBackground,
-        title: Text('Localization', style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Localization',
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           PopupMenuButton<PhantomLanguage>(
             icon: Row(
@@ -63,7 +74,14 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
               children: [
                 Icon(Icons.language, color: theme.onBackground, size: 18),
                 const SizedBox(width: 4),
-                Text(lang.displayName, style: TextStyle(color: theme.onBackground, fontSize: 14, fontWeight: FontWeight.bold)),
+                Text(
+                  lang.displayName,
+                  style: TextStyle(
+                    color: theme.onBackground,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
             color: theme.surface,
@@ -73,7 +91,10 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
                 value: l,
                 child: Row(
                   children: [
-                    Text(l.displayName, style: TextStyle(color: theme.onBackground)),
+                    Text(
+                      l.displayName,
+                      style: TextStyle(color: theme.onBackground),
+                    ),
                     if (l == lang) ...[
                       const Spacer(),
                       Icon(Icons.check, color: theme.success, size: 16),
@@ -104,7 +125,14 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
         children: [
           Icon(Icons.translate, color: theme.onBackgroundVariant, size: 48),
           const SizedBox(height: 16),
-          Text('No localization entries', style: TextStyle(color: theme.onBackground, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            'No localization entries',
+            style: TextStyle(
+              color: theme.onBackground,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           const SizedBox(height: 8),
           Text(
             'Use Phantom.registerLocalization() to add entries.',
@@ -123,14 +151,31 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          _groupChip('All', _selectedGroup == null, theme, () => setState(() => _selectedGroup = null)),
-          ...groups.map((g) => _groupChip(g, _selectedGroup == g, theme, () => setState(() => _selectedGroup = g))),
+          _groupChip(
+            'All',
+            _selectedGroup == null,
+            theme,
+            () => setState(() => _selectedGroup = null),
+          ),
+          ...groups.map(
+            (g) => _groupChip(
+              g,
+              _selectedGroup == g,
+              theme,
+              () => setState(() => _selectedGroup = g),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _groupChip(String label, bool selected, PhantomTheme theme, VoidCallback onTap) {
+  Widget _groupChip(
+    String label,
+    bool selected,
+    PhantomTheme theme,
+    VoidCallback onTap,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: GestureDetector(
@@ -142,10 +187,14 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
             borderRadius: BorderRadius.circular(8),
             border: selected ? null : Border.all(color: theme.outlineVariant),
           ),
-          child: Text(label, style: TextStyle(
-            color: selected ? theme.onPrimary : theme.onBackground,
-            fontSize: 12, fontWeight: FontWeight.bold,
-          )),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? theme.onPrimary : theme.onBackground,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ),
       ),
     );
@@ -156,7 +205,10 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-        decoration: BoxDecoration(color: theme.surface, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(
+          color: theme.surface,
+          borderRadius: BorderRadius.circular(10),
+        ),
         child: Row(
           children: [
             Icon(Icons.search, color: theme.onBackgroundVariant, size: 20),
@@ -167,7 +219,8 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
                 decoration: InputDecoration(
                   hintText: 'Search by key or value',
                   hintStyle: TextStyle(color: theme.onBackgroundVariant),
-                  border: InputBorder.none, isDense: true,
+                  border: InputBorder.none,
+                  isDense: true,
                   contentPadding: const EdgeInsets.symmetric(vertical: 8),
                 ),
                 onChanged: (v) => setState(() => _searchText = v),
@@ -179,7 +232,10 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
     );
   }
 
-  Widget _buildList(List<PhantomLocalizationEntry> entries, PhantomTheme theme) {
+  Widget _buildList(
+    List<PhantomLocalizationEntry> entries,
+    PhantomTheme theme,
+  ) {
     final lang = _localizer.currentLanguage;
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -189,7 +245,11 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
     );
   }
 
-  Widget _entryCard(PhantomLocalizationEntry entry, PhantomLanguage lang, PhantomTheme theme) {
+  Widget _entryCard(
+    PhantomLocalizationEntry entry,
+    PhantomLanguage lang,
+    PhantomTheme theme,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -203,20 +263,46 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
           Row(
             children: [
               Expanded(
-                child: Text(entry.key, style: TextStyle(color: theme.info, fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'monospace')),
+                child: Text(
+                  entry.key,
+                  style: TextStyle(
+                    color: theme.info,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'monospace',
+                  ),
+                ),
               ),
               if (_localizer.groups.length > 1)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(color: theme.surfaceVariant, borderRadius: BorderRadius.circular(4)),
-                  child: Text(entry.group, style: TextStyle(color: theme.onBackgroundVariant, fontSize: 10)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: theme.surfaceVariant,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    entry.group,
+                    style: TextStyle(
+                      color: theme.onBackgroundVariant,
+                      fontSize: 10,
+                    ),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 6),
-          Text('EN: ${entry.english}', style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12)),
+          Text(
+            'EN: ${entry.english}',
+            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12),
+          ),
           const SizedBox(height: 2),
-          Text('ES: ${entry.spanish}', style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12)),
+          Text(
+            'ES: ${entry.spanish}',
+            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12),
+          ),
           const SizedBox(height: 4),
           Row(
             children: [
@@ -225,7 +311,11 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
               Expanded(
                 child: Text(
                   entry.value(lang),
-                  style: TextStyle(color: theme.success, fontSize: 12, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: theme.success,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],

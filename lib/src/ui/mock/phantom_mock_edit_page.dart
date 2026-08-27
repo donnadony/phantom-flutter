@@ -31,12 +31,35 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
 
   static const _httpMethods = ['ANY', 'GET', 'POST', 'PUT', 'DELETE'];
   static const _statusCodes = <int, String>{
-    100: 'Continue', 101: 'Switching Protocols', 102: 'Processing', 103: 'Early Hints',
-    200: 'OK', 201: 'Created', 202: 'Accepted', 204: 'No Content', 206: 'Partial Content', 207: 'Multi-Status',
-    301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified', 307: 'Temporary Redirect', 308: 'Permanent Redirect',
-    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 405: 'Method Not Allowed',
-    408: 'Request Timeout', 409: 'Conflict', 422: 'Unprocessable Entity', 429: 'Too Many Requests',
-    500: 'Internal Server Error', 501: 'Not Implemented', 502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout',
+    100: 'Continue',
+    101: 'Switching Protocols',
+    102: 'Processing',
+    103: 'Early Hints',
+    200: 'OK',
+    201: 'Created',
+    202: 'Accepted',
+    204: 'No Content',
+    206: 'Partial Content',
+    207: 'Multi-Status',
+    301: 'Moved Permanently',
+    302: 'Found',
+    304: 'Not Modified',
+    307: 'Temporary Redirect',
+    308: 'Permanent Redirect',
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    405: 'Method Not Allowed',
+    408: 'Request Timeout',
+    409: 'Conflict',
+    422: 'Unprocessable Entity',
+    429: 'Too Many Requests',
+    500: 'Internal Server Error',
+    501: 'Not Implemented',
+    502: 'Bad Gateway',
+    503: 'Service Unavailable',
+    504: 'Gateway Timeout',
   };
 
   bool get _isEditing => widget.existingRule != null;
@@ -49,7 +72,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   void initState() {
     super.initState();
     final rule = widget.existingRule;
-    _descriptionController = TextEditingController(text: rule?.ruleDescription ?? '');
+    _descriptionController = TextEditingController(
+      text: rule?.ruleDescription ?? '',
+    );
     _urlPatternController = TextEditingController(text: rule?.urlPattern ?? '');
     final activeResponse = rule?.activeResponse;
     _httpMethod = activeResponse?.httpMethod ?? rule?.httpMethod ?? 'ANY';
@@ -82,7 +107,11 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
         ),
         title: Text(
           _isEditing ? 'Edit Mock Rule' : 'New Mock Rule',
-          style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         actions: [
           TextButton(
@@ -141,7 +170,11 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
     );
   }
 
-  Widget _textField(TextEditingController controller, String hint, PhantomTheme theme) {
+  Widget _textField(
+    TextEditingController controller,
+    String hint,
+    PhantomTheme theme,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -204,7 +237,10 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
           children: [
             Text(
               '$_statusCode - ${_statusCodes[_statusCode] ?? ''}',
-              style: TextStyle(color: theme.statusColor(_statusCode), fontSize: 14),
+              style: TextStyle(
+                color: theme.statusColor(_statusCode),
+                fontSize: 14,
+              ),
             ),
             const Spacer(),
             Icon(Icons.expand_more, color: theme.onBackgroundVariant, size: 20),
@@ -241,12 +277,26 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
           children: [
             GestureDetector(
               onTap: _pasteBody,
-              child: Text('Paste', style: TextStyle(color: theme.info, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Paste',
+                style: TextStyle(
+                  color: theme.info,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(width: 16),
             GestureDetector(
               onTap: _formatBody,
-              child: Text('Format', style: TextStyle(color: theme.info, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Format',
+                style: TextStyle(
+                  color: theme.info,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -295,14 +345,20 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
         child: Text(
           'Delete Rule',
           textAlign: TextAlign.center,
-          style: TextStyle(color: theme.error, fontSize: 14, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.error,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
   }
 
   void _save() {
-    final responseId = widget.existingRule?.activeResponse?.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final responseId =
+        widget.existingRule?.activeResponse?.id ??
+        DateTime.now().millisecondsSinceEpoch.toString();
     final response = PhantomMockResponse(
       id: responseId,
       name: 'Response 1',
@@ -311,7 +367,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
       responseBody: _responseBodyController.text,
     );
     final rule = PhantomMockRule(
-      id: widget.existingRule?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id:
+          widget.existingRule?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       isEnabled: widget.existingRule?.isEnabled ?? true,
       urlPattern: _urlPatternController.text.trim(),
       httpMethod: _httpMethod,
@@ -335,7 +393,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   void _formatBody() {
     try {
       final parsed = jsonDecode(_responseBodyController.text);
-      _responseBodyController.text = const JsonEncoder.withIndent('  ').convert(parsed);
+      _responseBodyController.text = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(parsed);
     } catch (_) {}
   }
 }
@@ -359,17 +419,56 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
   String _search = '';
 
   static const _common = <int, String>{
-    200: 'OK', 201: 'Created', 204: 'No Content',
-    400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden',
-    404: 'Not Found', 500: 'Internal Server Error',
+    200: 'OK',
+    201: 'Created',
+    204: 'No Content',
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    500: 'Internal Server Error',
   };
 
   static const _grouped = <String, Map<int, String>>{
-    '1xx - Informational': {100: 'Continue', 101: 'Switching Protocols', 102: 'Processing', 103: 'Early Hints'},
-    '2xx - Successful': {200: 'OK', 201: 'Created', 202: 'Accepted', 204: 'No Content', 206: 'Partial Content', 207: 'Multi-Status'},
-    '3xx - Redirection': {301: 'Moved Permanently', 302: 'Found', 304: 'Not Modified', 307: 'Temporary Redirect', 308: 'Permanent Redirect'},
-    '4xx - Client Error': {400: 'Bad Request', 401: 'Unauthorized', 403: 'Forbidden', 404: 'Not Found', 405: 'Method Not Allowed', 408: 'Request Timeout', 409: 'Conflict', 422: 'Unprocessable Entity', 429: 'Too Many Requests'},
-    '5xx - Server Error': {500: 'Internal Server Error', 501: 'Not Implemented', 502: 'Bad Gateway', 503: 'Service Unavailable', 504: 'Gateway Timeout'},
+    '1xx - Informational': {
+      100: 'Continue',
+      101: 'Switching Protocols',
+      102: 'Processing',
+      103: 'Early Hints',
+    },
+    '2xx - Successful': {
+      200: 'OK',
+      201: 'Created',
+      202: 'Accepted',
+      204: 'No Content',
+      206: 'Partial Content',
+      207: 'Multi-Status',
+    },
+    '3xx - Redirection': {
+      301: 'Moved Permanently',
+      302: 'Found',
+      304: 'Not Modified',
+      307: 'Temporary Redirect',
+      308: 'Permanent Redirect',
+    },
+    '4xx - Client Error': {
+      400: 'Bad Request',
+      401: 'Unauthorized',
+      403: 'Forbidden',
+      404: 'Not Found',
+      405: 'Method Not Allowed',
+      408: 'Request Timeout',
+      409: 'Conflict',
+      422: 'Unprocessable Entity',
+      429: 'Too Many Requests',
+    },
+    '5xx - Server Error': {
+      500: 'Internal Server Error',
+      501: 'Not Implemented',
+      502: 'Bad Gateway',
+      503: 'Service Unavailable',
+      504: 'Gateway Timeout',
+    },
   };
 
   bool _matches(int code, String label) {
@@ -388,16 +487,30 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            child: Text('Status Code', style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Status Code',
+              style: TextStyle(
+                color: theme.onBackground,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: theme.surface, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                color: theme.surface,
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: theme.onBackgroundVariant, size: 18),
+                  Icon(
+                    Icons.search,
+                    color: theme.onBackgroundVariant,
+                    size: 18,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
@@ -422,11 +535,15 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
               children: [
                 if (_search.isEmpty) ...[
                   _sectionHeader('Common', theme),
-                  ..._common.entries.where((e) => _matches(e.key, e.value)).map((e) => _codeRow(e.key, e.value, theme)),
+                  ..._common.entries
+                      .where((e) => _matches(e.key, e.value))
+                      .map((e) => _codeRow(e.key, e.value, theme)),
                   const SizedBox(height: 8),
                 ],
                 ..._grouped.entries.expand((group) {
-                  final filtered = group.value.entries.where((e) => _matches(e.key, e.value)).toList();
+                  final filtered = group.value.entries
+                      .where((e) => _matches(e.key, e.value))
+                      .toList();
                   if (filtered.isEmpty) return <Widget>[];
                   return [
                     if (_search.isEmpty) _sectionHeader(group.key, theme),
@@ -444,7 +561,14 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
   Widget _sectionHeader(String title, PhantomTheme theme) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      child: Text(title, style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11, fontWeight: FontWeight.bold)),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: theme.onBackgroundVariant,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
     );
   }
 

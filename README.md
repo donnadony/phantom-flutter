@@ -70,6 +70,28 @@ void main() {
 
 A floating purple debug button appears on screen. Tap it to open the Phantom debug panel.
 
+### 1b. Choose how the panel arrives
+
+By default the panel covers the app. Pass `presentation` to have it rise as a
+sheet instead — it opens at half the screen and the handle drags it up to full
+height:
+
+```dart
+PhantomOverlay(
+  presentation: PhantomPresentation.sheet,
+  initialSheetSize: 0.5,        // fraction of the screen; also the lower snap point
+  buttonIcon: Icons.bug_report_rounded,
+  theme: myTheme,               // the floating button takes primaryContainer / onPrimary
+  child: MaterialApp(home: MyHomePage()),
+)
+```
+
+The sheet leaves the app visible behind it, which is the point: most debugging
+is comparing what the screen shows against what the request actually returned.
+Drag the handle down past a quarter of the screen, or tap outside, to close.
+
+`fullScreen` remains the default, so this changes nothing for existing callers.
+
 ### 2. Log messages
 
 ```dart

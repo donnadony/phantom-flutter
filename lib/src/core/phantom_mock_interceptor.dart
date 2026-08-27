@@ -92,8 +92,9 @@ class PhantomMockInterceptor extends ChangeNotifier {
   }
 
   String exportRules() {
-    return const JsonEncoder.withIndent('  ')
-        .convert(_rules.map((r) => r.toJson()).toList());
+    return const JsonEncoder.withIndent(
+      '  ',
+    ).convert(_rules.map((r) => r.toJson()).toList());
   }
 
   Future<void> clearAll() async {

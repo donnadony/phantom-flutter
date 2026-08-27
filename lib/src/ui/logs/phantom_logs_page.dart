@@ -73,12 +73,18 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           'Logs (${_logger.logs.length})',
-          style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: _logger.clearAll,
-            child: Text('Clear', style: TextStyle(color: theme.error, fontWeight: FontWeight.w600)),
+            child: Text(
+              'Clear',
+              style: TextStyle(color: theme.error, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -136,7 +142,10 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedFilter = f),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: selected ? theme.primary : theme.surface,
                   borderRadius: BorderRadius.circular(8),
@@ -160,7 +169,10 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
   Widget _buildList(List<PhantomLogItem> logs, PhantomTheme theme) {
     if (logs.isEmpty) {
       return Center(
-        child: Text('No logs', style: TextStyle(color: theme.onBackgroundVariant)),
+        child: Text(
+          'No logs',
+          style: TextStyle(color: theme.onBackgroundVariant),
+        ),
       );
     }
     return ListView.separated(
@@ -204,21 +216,30 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
               if (item.tag != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 1,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.surfaceVariant,
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     item.tag!,
-                    style: TextStyle(color: theme.onBackgroundVariant, fontSize: 10),
+                    style: TextStyle(
+                      color: theme.onBackgroundVariant,
+                      fontSize: 10,
+                    ),
                   ),
                 ),
               ],
               const Spacer(),
               Text(
                 _formatTime(item.createdAt),
-                style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11),
+                style: TextStyle(
+                  color: theme.onBackgroundVariant,
+                  fontSize: 11,
+                ),
               ),
             ],
           ),

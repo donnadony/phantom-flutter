@@ -6,7 +6,11 @@ void main() {
     setUp(() => PhantomLogger.instance.clearAll());
 
     test('logs items with correct level and tag', () {
-      PhantomLogger.instance.log(PhantomLogLevel.info, 'test message', tag: 'Auth');
+      PhantomLogger.instance.log(
+        PhantomLogLevel.info,
+        'test message',
+        tag: 'Auth',
+      );
 
       expect(PhantomLogger.instance.logs.length, 1);
       expect(PhantomLogger.instance.logs.first.level, PhantomLogLevel.info);

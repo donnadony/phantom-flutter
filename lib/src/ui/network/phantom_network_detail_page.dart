@@ -42,7 +42,9 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         title: Text(
           '${item.methodType} ${item.statusCode != null ? item.statusCode.toString() : ''}',
           style: TextStyle(
-              color: theme.onBackground, fontWeight: FontWeight.bold),
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Column(
@@ -77,8 +79,10 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
             children: [
               if (item.statusCode != null) ...[
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.statusBackgroundColor(item.statusCode!),
                     borderRadius: BorderRadius.circular(8),
@@ -110,7 +114,9 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                 Text(
                   _formatBytes(item.responseSizeBytes),
                   style: TextStyle(
-                      color: theme.onBackgroundVariant, fontSize: 12),
+                    color: theme.onBackgroundVariant,
+                    fontSize: 12,
+                  ),
                 ),
             ],
           ),
@@ -143,7 +149,9 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                   tab.name[0].toUpperCase() + tab.name.substring(1),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: selected ? theme.background : theme.onBackgroundVariant,
+                    color: selected
+                        ? theme.background
+                        : theme.onBackgroundVariant,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -163,8 +171,9 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         text = item.requestBody.isEmpty ? 'No request body' : item.requestBody;
         break;
       case _DetailTab.response:
-        text =
-            item.responseBody.isEmpty ? 'No response body' : item.responseBody;
+        text = item.responseBody.isEmpty
+            ? 'No response body'
+            : item.responseBody;
         break;
       case _DetailTab.headers:
         text =

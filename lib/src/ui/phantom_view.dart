@@ -50,13 +50,41 @@ class PhantomViewBody extends StatelessWidget {
     final theme = PhantomThemeProvider.of(context);
 
     final items = [
-      _MenuItem(title: 'Logs', icon: Icons.description_outlined, destination: const PhantomLogsPage()),
-      _MenuItem(title: 'Network', icon: Icons.language, destination: const PhantomNetworkPage()),
-      _MenuItem(title: 'Mock Services', icon: Icons.sensors, destination: const PhantomMockListPage()),
-      _MenuItem(title: 'Configuration', icon: Icons.settings_outlined, destination: const PhantomConfigPage()),
-      _MenuItem(title: 'Device Info', icon: Icons.phone_iphone, destination: const PhantomDeviceInfoPage()),
-      _MenuItem(title: 'SharedPreferences', icon: Icons.storage_outlined, destination: const PhantomSharedPrefsPage()),
-      _MenuItem(title: 'Localization', icon: Icons.public, destination: const PhantomLocalizationPage()),
+      _MenuItem(
+        title: 'Logs',
+        icon: Icons.description_outlined,
+        destination: const PhantomLogsPage(),
+      ),
+      _MenuItem(
+        title: 'Network',
+        icon: Icons.language,
+        destination: const PhantomNetworkPage(),
+      ),
+      _MenuItem(
+        title: 'Mock Services',
+        icon: Icons.sensors,
+        destination: const PhantomMockListPage(),
+      ),
+      _MenuItem(
+        title: 'Configuration',
+        icon: Icons.settings_outlined,
+        destination: const PhantomConfigPage(),
+      ),
+      _MenuItem(
+        title: 'Device Info',
+        icon: Icons.phone_iphone,
+        destination: const PhantomDeviceInfoPage(),
+      ),
+      _MenuItem(
+        title: 'SharedPreferences',
+        icon: Icons.storage_outlined,
+        destination: const PhantomSharedPrefsPage(),
+      ),
+      _MenuItem(
+        title: 'Localization',
+        icon: Icons.public,
+        destination: const PhantomLocalizationPage(),
+      ),
     ];
 
     return SingleChildScrollView(
@@ -64,14 +92,23 @@ class PhantomViewBody extends StatelessWidget {
         children: [
           for (final item in items) ...[
             _phantomRow(context, item: item, theme: theme),
-            Divider(height: 1, color: theme.outlineVariant, indent: 16, endIndent: 16),
+            Divider(
+              height: 1,
+              color: theme.outlineVariant,
+              indent: 16,
+              endIndent: 16,
+            ),
           ],
         ],
       ),
     );
   }
 
-  Widget _phantomRow(BuildContext context, {required _MenuItem item, required PhantomTheme theme}) {
+  Widget _phantomRow(
+    BuildContext context, {
+    required _MenuItem item,
+    required PhantomTheme theme,
+  }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: item.destination != null
@@ -99,13 +136,19 @@ class PhantomViewBody extends StatelessWidget {
               child: Text(
                 item.title,
                 style: TextStyle(
-                  color: item.destination != null ? theme.onBackground : theme.onBackgroundVariant,
+                  color: item.destination != null
+                      ? theme.onBackground
+                      : theme.onBackgroundVariant,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: theme.onBackgroundVariant, size: 20),
+            Icon(
+              Icons.chevron_right,
+              color: theme.onBackgroundVariant,
+              size: 20,
+            ),
           ],
         ),
       ),

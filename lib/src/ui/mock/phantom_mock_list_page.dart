@@ -41,7 +41,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           'Mock Services',
-          style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -63,7 +66,11 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
           const SizedBox(height: 16),
           Text(
             'No mock rules',
-            style: TextStyle(color: theme.onBackground, fontSize: 18, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: theme.onBackground,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -136,7 +143,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                         Expanded(
                           child: Text(
                             rule.urlPattern,
-                            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12),
+                            style: TextStyle(
+                              color: theme.onBackgroundVariant,
+                              fontSize: 12,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -148,15 +158,22 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
-                              color: theme.statusBackgroundColor(activeResponse.statusCode),
+                              color: theme.statusBackgroundColor(
+                                activeResponse.statusCode,
+                              ),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               '${activeResponse.statusCode}',
                               style: TextStyle(
-                                color: theme.statusColor(activeResponse.statusCode),
+                                color: theme.statusColor(
+                                  activeResponse.statusCode,
+                                ),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -165,13 +182,19 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                           const SizedBox(width: 6),
                           Text(
                             activeResponse.name,
-                            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11),
+                            style: TextStyle(
+                              color: theme.onBackgroundVariant,
+                              fontSize: 11,
+                            ),
                           ),
                           if (rule.responses.length > 1) ...[
                             const SizedBox(width: 6),
                             Text(
                               '(${rule.responses.length} responses)',
-                              style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11),
+                              style: TextStyle(
+                                color: theme.onBackgroundVariant,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ],
@@ -210,7 +233,11 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
     );
   }
 
-  void _openEditor(BuildContext context, PhantomTheme theme, PhantomMockRule? rule) {
+  void _openEditor(
+    BuildContext context,
+    PhantomTheme theme,
+    PhantomMockRule? rule,
+  ) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PhantomThemeProvider(
@@ -224,7 +251,9 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                 _interceptor.addRule(savedRule);
               }
             },
-            onDelete: rule != null ? () => _interceptor.deleteRule(rule.id) : null,
+            onDelete: rule != null
+                ? () => _interceptor.deleteRule(rule.id)
+                : null,
           ),
         ),
       ),
