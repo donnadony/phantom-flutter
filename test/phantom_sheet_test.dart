@@ -36,7 +36,17 @@ void main() {
     expect(panel.bottom, closeTo(screen.height, 0.5));
   });
 
-  testWidgets('dragging the handle up snaps it to full height', (tester) async {
+  testWidgets('dragging the handle up stops below the status bar', (
+    tester,
+  ) async {
+    // An iOS sheet's tallest detent leaves the presenting screen showing above
+    // it rather than going edge to edge, which would put the grabber and the
+    // rounded corners under the notch.
+    tester.view.physicalSize = const Size(400, 800);
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.padding = const FakeViewPadding(top: 47);
+    addTearDown(tester.view.reset);
+
     await tester.pumpWidget(_harness());
     await tester.pumpAndSettle();
 
@@ -45,9 +55,12 @@ void main() {
     await tester.pumpAndSettle();
 
     final panel = tester.getRect(find.byType(ClipRRect).first);
-    final screen = tester.getSize(find.byType(MaterialApp).first);
 
-    expect(panel.height / screen.height, closeTo(1.0, 0.01));
+    expect(panel.top, greaterThan(47),
+        reason: 'the sheet must clear the status bar');
+    expect(panel.top, lessThan(80),
+        reason: 'but only by a sliver, not a wide band');
+    expect(panel.bottom, closeTo(800, 0.5));
   });
 
   testWidgets('a small drag settles back rather than resting off-snap', (
