@@ -29,6 +29,8 @@ class PhantomSheet extends StatefulWidget {
     super.key,
     required this.theme,
     required this.onClose,
+    this.onToggleButton,
+    this.buttonHidden = false,
     this.initialSize = 0.5,
     this.minSize = 0.25,
     this.maxSize = 1.0,
@@ -48,6 +50,11 @@ class PhantomSheet extends StatefulWidget {
 
   final PhantomTheme theme;
   final VoidCallback onClose;
+
+  /// Forwarded to [PhantomView] so the panel can hide the host's floating
+  /// button. Null when there is none to act on.
+  final VoidCallback? onToggleButton;
+  final bool buttonHidden;
 
   /// Fraction of the screen the sheet occupies when it opens, and the lower of
   /// the two heights it snaps between.
@@ -164,7 +171,11 @@ class _PhantomSheetState extends State<PhantomSheet> {
                       child: child!,
                     );
                   },
-                  home: PhantomView(onClose: widget.onClose),
+                  home: PhantomView(
+                    onClose: widget.onClose,
+                    onToggleButton: widget.onToggleButton,
+                    buttonHidden: widget.buttonHidden,
+                  ),
                 ),
               ),
             ),

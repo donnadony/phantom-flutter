@@ -1,3 +1,15 @@
+## 0.0.5
+
+### Added
+
+* **The floating button can be hidden from the panel.** A row at the foot of the menu takes it off the screen — useful when it covers the very thing being inspected, or for a clean screenshot. With it hidden, shaking the device reopens Phantom, and the same row puts the button back.
+
+  The hidden state is deliberately not persisted: it lasts the session, so restarting the app is a guaranteed way back on every platform, including desktop and web where there is no accelerometer to shake. The row says so, since the gesture leaves no trace on screen to discover.
+
+### Dependencies
+
+* Adds `sensors_plus` for shake detection.
+
 ## 0.0.4
 
 ### Fixed

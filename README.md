@@ -96,6 +96,16 @@ Drag the handle down past a quarter of the screen, or tap outside, to close.
 
 `fullScreen` remains the default, so this changes nothing for existing callers.
 
+### 1c. Get the button out of the way
+
+The panel's last row hides the floating button when it covers what you are
+trying to look at. Shake the device to bring Phantom back, and the same row
+restores the button.
+
+Hiding lasts the session only, so restarting the app also brings the button
+back — which matters on desktop and web, where there is no accelerometer and
+the shake gesture does nothing.
+
 ### 2. Log messages
 
 ```dart
@@ -361,6 +371,7 @@ phantom_flutter/
 | `url_launcher` | Deep link tester |
 | `share_plus` | Exporting logs, network captures, and mocks |
 | `file_picker` | Importing mock collections |
+| `sensors_plus` | Shake to reopen once the floating button is hidden |
 
 All are first-party Flutter community packages. No third-party dependencies.
 

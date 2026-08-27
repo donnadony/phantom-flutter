@@ -4,6 +4,7 @@ import 'phantom_main.dart';
 import 'theme/phantom_theme.dart';
 import 'ui/phantom_sheet.dart';
 import 'ui/phantom_view.dart';
+import 'utils/phantom_shake_detector.dart';
 
 class PhantomOverlay extends StatefulWidget {
   final Widget child;
@@ -26,6 +27,10 @@ class PhantomOverlay extends StatefulWidget {
   /// already spend that shape on something else can pass their own.
   final IconData buttonIcon;
 
+  /// Injected in tests so a shake can be driven without an accelerometer.
+  @visibleForTesting
+  final PhantomShakeDetector? shakeDetector;
+
   const PhantomOverlay({
     super.key,
     required this.child,
@@ -34,6 +39,7 @@ class PhantomOverlay extends StatefulWidget {
     this.presentation = PhantomPresentation.fullScreen,
     this.initialSheetSize = 0.5,
     this.buttonIcon = Icons.bug_report_rounded,
+    this.shakeDetector,
   }) : assert(
          initialSheetSize > 0 && initialSheetSize <= 1,
          'initialSheetSize is a fraction of the screen. At 0 the panel has no '
@@ -49,6 +55,15 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
   bool _hasDragged = false;
   bool _phantomOpen = false;
 
+  /// Deliberately not persisted. Hiding the button is for getting it out of
+  /// the way of the screen underneath, and a restart is then a guaranteed way
+  /// back on every platform — including the ones with no accelerometer, where
+  /// the shake gesture cannot help.
+  bool _buttonHidden = false;
+
+  late final PhantomShakeDetector _shake =
+      widget.shakeDetector ?? PhantomShakeDetector();
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +71,28 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
       Phantom.setTheme(widget.theme!);
     }
     Phantom.loadMocks();
+  }
+
+  @override
+  void dispose() {
+    _shake.dispose();
+    super.dispose();
+  }
+
+  /// The sensor runs only while the button is hidden and the panel is closed —
+  /// the one window where a shake is the only way back in.
+  void _syncShakeListener() {
+    final needed = _buttonHidden && !_phantomOpen;
+    if (needed && !_shake.isRunning) {
+      _shake.start(_openPhantom);
+    } else if (!needed && _shake.isRunning) {
+      _shake.stop();
+    }
+  }
+
+  void _toggleButton() {
+    setState(() => _buttonHidden = !_buttonHidden);
+    _syncShakeListener();
   }
 
   @override
@@ -67,7 +104,7 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
       child: Stack(
         children: [
           widget.child,
-          if (!_phantomOpen)
+          if (!_phantomOpen && !_buttonHidden)
             Positioned(
               left: _buttonPosition.dx,
               top: _buttonPosition.dy,
@@ -101,11 +138,15 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
                 PhantomPresentation.fullScreen => _PhantomApp(
                   theme: widget.theme ?? Phantom.theme,
                   onClose: _closePhantom,
+                  onToggleButton: _toggleButton,
+                  buttonHidden: _buttonHidden,
                 ),
                 PhantomPresentation.sheet => PhantomSheet(
                   theme: widget.theme ?? Phantom.theme,
                   initialSize: widget.initialSheetSize,
                   onClose: _closePhantom,
+                  onToggleButton: _toggleButton,
+                  buttonHidden: _buttonHidden,
                 ),
               },
             ),
@@ -126,19 +167,30 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
   }
 
   void _openPhantom() {
+    if (!mounted) return;
     setState(() => _phantomOpen = true);
+    _syncShakeListener();
   }
 
   void _closePhantom() {
-    if (mounted) setState(() => _phantomOpen = false);
+    if (!mounted) return;
+    setState(() => _phantomOpen = false);
+    _syncShakeListener();
   }
 }
 
 class _PhantomApp extends StatelessWidget {
   final PhantomTheme theme;
   final VoidCallback onClose;
+  final VoidCallback onToggleButton;
+  final bool buttonHidden;
 
-  const _PhantomApp({required this.theme, required this.onClose});
+  const _PhantomApp({
+    required this.theme,
+    required this.onClose,
+    required this.onToggleButton,
+    required this.buttonHidden,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +199,11 @@ class _PhantomApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData.dark(),
-        home: PhantomView(onClose: onClose),
+        home: PhantomView(
+          onClose: onClose,
+          onToggleButton: onToggleButton,
+          buttonHidden: buttonHidden,
+        ),
       ),
     );
   }

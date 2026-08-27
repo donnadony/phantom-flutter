@@ -6,7 +6,22 @@ import '../theme/phantom_theme.dart';
 class PhantomView extends StatelessWidget {
   final VoidCallback? onClose;
 
-  const PhantomView({super.key, this.onClose});
+  /// Hides or restores the host overlay's floating button.
+  ///
+  /// Null when there is no floating button to act on — `Phantom.show(context)`
+  /// pushes the panel with no overlay behind it — and the row is left out.
+  final VoidCallback? onToggleButton;
+
+  /// Whether the floating button is currently hidden, which decides whether the
+  /// row offers to hide or to restore it.
+  final bool buttonHidden;
+
+  const PhantomView({
+    super.key,
+    this.onClose,
+    this.onToggleButton,
+    this.buttonHidden = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -29,15 +44,26 @@ class PhantomView extends StatelessWidget {
           onPressed: onClose ?? () => Navigator.of(context).pop(),
         ),
       ),
-      body: PhantomViewBody(onClose: onClose),
+      body: PhantomViewBody(
+        onClose: onClose,
+        onToggleButton: onToggleButton,
+        buttonHidden: buttonHidden,
+      ),
     );
   }
 }
 
 class PhantomViewBody extends StatelessWidget {
   final VoidCallback? onClose;
+  final VoidCallback? onToggleButton;
+  final bool buttonHidden;
 
-  const PhantomViewBody({super.key, this.onClose});
+  const PhantomViewBody({
+    super.key,
+    this.onClose,
+    this.onToggleButton,
+    this.buttonHidden = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +74,6 @@ class PhantomViewBody extends StatelessWidget {
         children: [
           for (final feature in Phantom.features) ...[
             _row(
-              context,
               theme: theme,
               title: feature.title,
               icon: feature.icon,
@@ -58,7 +83,6 @@ class PhantomViewBody extends StatelessWidget {
           ],
           for (final entry in Phantom.customEntries) ...[
             _row(
-              context,
               theme: theme,
               title: entry.title,
               icon: entry.icon,
@@ -66,7 +90,31 @@ class PhantomViewBody extends StatelessWidget {
             ),
             _divider(theme),
           ],
+          if (onToggleButton != null) _buttonToggle(theme),
         ],
+      ),
+    );
+  }
+
+  /// Set apart from the feature list: it acts on Phantom's own chrome rather
+  /// than opening a debug module.
+  Widget _buttonToggle(PhantomTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: _row(
+        theme: theme,
+        title: buttonHidden ? 'Show floating button' : 'Hide floating button',
+        // The gesture that reopens Phantom leaves no trace on screen, so the
+        // row is where it gets taught.
+        subtitle: buttonHidden
+            ? 'It will reappear where it was.'
+            : 'Shake the device to reopen Phantom. Restarting the app also '
+                'brings it back.',
+        icon: buttonHidden
+            ? Icons.visibility_outlined
+            : Icons.visibility_off_outlined,
+        onTap: onToggleButton!,
+        showChevron: false,
       ),
     );
   }
@@ -89,12 +137,13 @@ class PhantomViewBody extends StatelessWidget {
     );
   }
 
-  Widget _row(
-    BuildContext context, {
+  Widget _row({
     required PhantomTheme theme,
     required String title,
     required IconData icon,
     required VoidCallback onTap,
+    String? subtitle,
+    bool showChevron = true,
   }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -109,17 +158,33 @@ class PhantomViewBody extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: theme.onBackground,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: theme.onBackground,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        color: theme.onBackgroundVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
-            Icon(Icons.chevron_right,
-                color: theme.onBackgroundVariant, size: 20),
+            if (showChevron)
+              Icon(Icons.chevron_right,
+                  color: theme.onBackgroundVariant, size: 20),
           ],
         ),
       ),
