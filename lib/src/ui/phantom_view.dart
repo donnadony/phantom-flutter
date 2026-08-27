@@ -109,7 +109,7 @@ class PhantomViewBody extends StatelessWidget {
         subtitle: buttonHidden
             ? 'It will reappear where it was.'
             : 'Shake the device to reopen Phantom. Restarting the app also '
-                'brings it back.',
+                  'brings it back.',
         icon: buttonHidden
             ? Icons.visibility_outlined
             : Icons.visibility_off_outlined,
@@ -120,19 +120,16 @@ class PhantomViewBody extends StatelessWidget {
   }
 
   Widget _divider(PhantomTheme theme) => Divider(
-        height: 1,
-        color: theme.outlineVariant,
-        indent: 16,
-        endIndent: 16,
-      );
+    height: 1,
+    color: theme.outlineVariant,
+    indent: 16,
+    endIndent: 16,
+  );
 
   void _push(BuildContext context, PhantomTheme theme, Widget destination) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => PhantomThemeProvider(
-          theme: theme,
-          child: destination,
-        ),
+        builder: (_) => PhantomThemeProvider(theme: theme, child: destination),
       ),
     );
   }
@@ -183,8 +180,11 @@ class PhantomViewBody extends StatelessWidget {
               ),
             ),
             if (showChevron)
-              Icon(Icons.chevron_right,
-                  color: theme.onBackgroundVariant, size: 20),
+              Icon(
+                Icons.chevron_right,
+                color: theme.onBackgroundVariant,
+                size: 20,
+              ),
           ],
         ),
       ),

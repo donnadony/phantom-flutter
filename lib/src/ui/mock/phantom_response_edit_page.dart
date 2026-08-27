@@ -41,10 +41,12 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
   void initState() {
     super.initState();
     final existing = widget.existingResponse;
-    _nameController =
-        TextEditingController(text: existing?.name ?? widget.defaultName);
-    _bodyController =
-        TextEditingController(text: existing?.responseBody ?? '{\n  \n}');
+    _nameController = TextEditingController(
+      text: existing?.name ?? widget.defaultName,
+    );
+    _bodyController = TextEditingController(
+      text: existing?.responseBody ?? '{\n  \n}',
+    );
     _httpMethod = existing?.httpMethod ?? widget.defaultMethod;
     _statusCode = existing?.statusCode ?? 200;
   }
@@ -72,9 +74,10 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
         title: Text(
           _isEditing ? 'Edit Response' : 'New Response',
           style: TextStyle(
-              color: theme.onBackground,
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         actions: [
           TextButton(
@@ -108,7 +111,9 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
                   onTap: () => setState(() => _httpMethod = method),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 8),
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: selected ? theme.primary : theme.surface,
                       borderRadius: BorderRadius.circular(8),
@@ -136,8 +141,10 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
                 onSelect: (code) => setState(() => _statusCode = code),
               ),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: theme.surface,
                   borderRadius: BorderRadius.circular(10),
@@ -147,11 +154,16 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
                     Text(
                       '$_statusCode - ${phantomStatusCodeLabel(_statusCode)}',
                       style: TextStyle(
-                          color: theme.statusColor(_statusCode), fontSize: 14),
+                        color: theme.statusColor(_statusCode),
+                        fontSize: 14,
+                      ),
                     ),
                     const Spacer(),
-                    Icon(Icons.expand_more,
-                        color: theme.onBackgroundVariant, size: 20),
+                    Icon(
+                      Icons.expand_more,
+                      color: theme.onBackgroundVariant,
+                      size: 20,
+                    ),
                   ],
                 ),
               ),
@@ -163,20 +175,26 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
                 const Spacer(),
                 GestureDetector(
                   onTap: _pasteBody,
-                  child: Text('Paste',
-                      style: TextStyle(
-                          color: theme.info,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'Paste',
+                    style: TextStyle(
+                      color: theme.info,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 16),
                 GestureDetector(
                   onTap: _formatBody,
-                  child: Text('Format',
-                      style: TextStyle(
-                          color: theme.info,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'Format',
+                    style: TextStyle(
+                      color: theme.info,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -223,7 +241,10 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
   }
 
   Widget _textField(
-      TextEditingController controller, String hint, PhantomTheme theme) {
+    TextEditingController controller,
+    String hint,
+    PhantomTheme theme,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -248,7 +269,8 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
 
   void _save() {
     final response = PhantomMockResponse(
-      id: widget.existingResponse?.id ??
+      id:
+          widget.existingResponse?.id ??
           DateTime.now().microsecondsSinceEpoch.toString(),
       name: _nameController.text.trim(),
       httpMethod: _httpMethod,
@@ -268,8 +290,7 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
   void _formatBody() {
     try {
       final parsed = jsonDecode(_bodyController.text);
-      _bodyController.text =
-          const JsonEncoder.withIndent('  ').convert(parsed);
+      _bodyController.text = const JsonEncoder.withIndent('  ').convert(parsed);
     } catch (_) {}
   }
 }

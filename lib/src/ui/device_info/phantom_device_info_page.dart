@@ -65,9 +65,15 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
     final size = view.physicalSize;
     final ratio = view.devicePixelRatio;
     screenSection = [
-      _InfoItem('Screen Size', '${(size.width / ratio).toStringAsFixed(0)} x ${(size.height / ratio).toStringAsFixed(0)}'),
+      _InfoItem(
+        'Screen Size',
+        '${(size.width / ratio).toStringAsFixed(0)} x ${(size.height / ratio).toStringAsFixed(0)}',
+      ),
       _InfoItem('Pixel Ratio', '${ratio.toStringAsFixed(1)}x'),
-      _InfoItem('Physical Pixels', '${size.width.toStringAsFixed(0)} x ${size.height.toStringAsFixed(0)}'),
+      _InfoItem(
+        'Physical Pixels',
+        '${size.width.toStringAsFixed(0)} x ${size.height.toStringAsFixed(0)}',
+      ),
     ];
 
     final storageSection = await _storageItems();
@@ -91,7 +97,10 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
   Future<List<_InfoItem>> _storageItems() async {
     final items = <_InfoItem>[];
 
-    Future<void> add(String label, Future<Directory?> Function() resolve) async {
+    Future<void> add(
+      String label,
+      Future<Directory?> Function() resolve,
+    ) async {
       try {
         final dir = await resolve();
         if (dir == null || !dir.existsSync()) return;
@@ -148,7 +157,13 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
       appBar: AppBar(
         backgroundColor: theme.background,
         foregroundColor: theme.onBackground,
-        title: Text('Device Info', style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Device Info',
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: _sections.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -161,7 +176,11 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
     );
   }
 
-  Widget _buildSection(String title, List<_InfoItem> items, PhantomTheme theme) {
+  Widget _buildSection(
+    String title,
+    List<_InfoItem> items,
+    PhantomTheme theme,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -174,7 +193,14 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
-            child: Text(title, style: TextStyle(color: theme.primary, fontSize: 13, fontWeight: FontWeight.bold)),
+            child: Text(
+              title,
+              style: TextStyle(
+                color: theme.primary,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           ...items.map((item) => _infoRow(item, theme)),
           const SizedBox(height: 4),
@@ -199,7 +225,13 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
         child: Row(
           children: [
             Expanded(
-              child: Text(item.label, style: TextStyle(color: theme.onBackgroundVariant, fontSize: 13)),
+              child: Text(
+                item.label,
+                style: TextStyle(
+                  color: theme.onBackgroundVariant,
+                  fontSize: 13,
+                ),
+              ),
             ),
             if (copied)
               Icon(Icons.check, color: theme.success, size: 14)
@@ -207,7 +239,11 @@ class _PhantomDeviceInfoPageState extends State<PhantomDeviceInfoPage> {
               Flexible(
                 child: Text(
                   item.value,
-                  style: TextStyle(color: theme.onBackground, fontSize: 13, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackground,
+                    fontSize: 13,
+                    fontFamily: 'monospace',
+                  ),
                   textAlign: TextAlign.end,
                   overflow: TextOverflow.ellipsis,
                 ),

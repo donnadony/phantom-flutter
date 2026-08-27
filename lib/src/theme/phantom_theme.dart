@@ -118,8 +118,8 @@ class PhantomThemeProvider extends InheritedWidget {
   });
 
   static PhantomTheme of(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<PhantomThemeProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<PhantomThemeProvider>();
     return provider?.theme ?? PhantomTheme.kodivex;
   }
 

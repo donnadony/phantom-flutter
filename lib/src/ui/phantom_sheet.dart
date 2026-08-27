@@ -39,10 +39,7 @@ class PhantomSheet extends StatefulWidget {
          'initialSize must be at least minSize, or the sheet opens already '
          'below its close threshold and dismisses on the first touch.',
        ),
-       assert(
-         maxSize >= initialSize,
-         'maxSize must be at least initialSize.',
-       ),
+       assert(maxSize >= initialSize, 'maxSize must be at least initialSize.'),
        assert(
          maxSize <= 1.0 && minSize > 0,
          'Sizes are fractions of the screen, between 0 and 1.',
@@ -131,8 +128,10 @@ class _PhantomSheetState extends State<PhantomSheet> {
                 // Floor below minSize, not a constant: the drag has to be
                 // able to cross the close threshold for the gesture to work
                 // at all, whatever minSize the caller chose.
-                _size = (_size - dy / maxHeight)
-                    .clamp(widget.minSize / 2, widget.maxSize);
+                _size = (_size - dy / maxHeight).clamp(
+                  widget.minSize / 2,
+                  widget.maxSize,
+                );
               }),
               onDragEnd: _settle,
             ),

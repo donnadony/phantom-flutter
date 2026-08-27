@@ -22,14 +22,16 @@ class PhantomConfig extends ChangeNotifier {
     String group = 'General',
   }) {
     if (_entries.any((e) => e.key == key)) return;
-    _entries.add(PhantomConfigEntry(
-      label: label,
-      key: key,
-      defaultValue: defaultValue,
-      type: type,
-      options: options,
-      group: group,
-    ));
+    _entries.add(
+      PhantomConfigEntry(
+        label: label,
+        key: key,
+        defaultValue: defaultValue,
+        type: type,
+        options: options,
+        group: group,
+      ),
+    );
     notifyListeners();
   }
 
@@ -52,9 +54,9 @@ class PhantomConfig extends ChangeNotifier {
     final override = await value(key);
     if (override != null && override.isNotEmpty) return override;
     final entry = _entries.cast<PhantomConfigEntry?>().firstWhere(
-          (e) => e!.key == key,
-          orElse: () => null,
-        );
+      (e) => e!.key == key,
+      orElse: () => null,
+    );
     return entry?.defaultValue ?? '';
   }
 

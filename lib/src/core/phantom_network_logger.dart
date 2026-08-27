@@ -68,19 +68,21 @@ class PhantomNetworkLogger extends ChangeNotifier {
       );
       _removePending(existing.id);
     } else {
-      _items.add(PhantomNetworkItem(
-        id: _nextId(),
-        url: url,
-        methodType: 'GET',
-        responseHeaders: headers,
-        responseBody: body,
-        responseSizeBytes: responseSize,
-        statusCode: statusCode,
-        completedAt: now,
-        durationMs: durationMs,
-        createdAt: now,
-        isMock: isMock,
-      ));
+      _items.add(
+        PhantomNetworkItem(
+          id: _nextId(),
+          url: url,
+          methodType: 'GET',
+          responseHeaders: headers,
+          responseBody: body,
+          responseSizeBytes: responseSize,
+          statusCode: statusCode,
+          completedAt: now,
+          durationMs: durationMs,
+          createdAt: now,
+          isMock: isMock,
+        ),
+      );
     }
     notifyListeners();
   }
@@ -136,21 +138,23 @@ class PhantomNetworkLogger extends ChangeNotifier {
       final createdAt = durationMs != null
           ? now.subtract(Duration(milliseconds: durationMs))
           : now;
-      _items.add(PhantomNetworkItem(
-        id: _nextId(),
-        url: url,
-        methodType: method,
-        requestHeaders: requestHeaders,
-        requestBody: requestBody,
-        responseHeaders: responseHeaders,
-        responseBody: responseBody,
-        responseSizeBytes: responseSize,
-        statusCode: statusCode,
-        completedAt: now,
-        durationMs: durationMs,
-        createdAt: createdAt,
-        isMock: isMock,
-      ));
+      _items.add(
+        PhantomNetworkItem(
+          id: _nextId(),
+          url: url,
+          methodType: method,
+          requestHeaders: requestHeaders,
+          requestBody: requestBody,
+          responseHeaders: responseHeaders,
+          responseBody: responseBody,
+          responseSizeBytes: responseSize,
+          statusCode: statusCode,
+          completedAt: now,
+          durationMs: durationMs,
+          createdAt: createdAt,
+          isMock: isMock,
+        ),
+      );
     }
     notifyListeners();
   }
@@ -191,8 +195,10 @@ class PhantomNetworkLogger extends ChangeNotifier {
     notifyListeners();
   }
 
-  void logExternalEntry(Map<String, dynamic> data,
-      {String sourcePrefix = '[External]'}) {
+  void logExternalEntry(
+    Map<String, dynamic> data, {
+    String sourcePrefix = '[External]',
+  }) {
     final url = data['url'] as String? ?? '';
     final method = data['method'] as String? ?? 'GET';
     final statusCode = data['statusCode'] as int?;
@@ -205,20 +211,22 @@ class PhantomNetworkLogger extends ChangeNotifier {
         ? now.subtract(Duration(milliseconds: durationMs))
         : now;
 
-    _items.add(PhantomNetworkItem(
-      id: _nextId(),
-      url: url,
-      methodType: '$sourcePrefix $method',
-      requestHeaders: requestHeaders,
-      requestBody: 'No body',
-      responseHeaders: 'No headers',
-      responseBody: responseBody,
-      responseSizeBytes: responseSizeBytes,
-      statusCode: statusCode,
-      completedAt: now,
-      durationMs: durationMs,
-      createdAt: createdAt,
-    ));
+    _items.add(
+      PhantomNetworkItem(
+        id: _nextId(),
+        url: url,
+        methodType: '$sourcePrefix $method',
+        requestHeaders: requestHeaders,
+        requestBody: 'No body',
+        responseHeaders: 'No headers',
+        responseBody: responseBody,
+        responseSizeBytes: responseSizeBytes,
+        statusCode: statusCode,
+        completedAt: now,
+        durationMs: durationMs,
+        createdAt: createdAt,
+      ),
+    );
     notifyListeners();
   }
 
@@ -262,8 +270,9 @@ class PhantomNetworkLogger extends ChangeNotifier {
     final ids = _pendingByKey[key];
     if (ids != null) {
       for (final id in ids) {
-        final index =
-            _items.indexWhere((item) => item.id == id && item.isPending);
+        final index = _items.indexWhere(
+          (item) => item.id == id && item.isPending,
+        );
         if (index != -1) return index;
       }
     }
@@ -274,8 +283,9 @@ class PhantomNetworkLogger extends ChangeNotifier {
     final ids = _pendingByUrl[url];
     if (ids == null) return null;
     for (final id in ids) {
-      final index =
-          _items.indexWhere((item) => item.id == id && item.isPending);
+      final index = _items.indexWhere(
+        (item) => item.id == id && item.isPending,
+      );
       if (index != -1) return index;
     }
     return null;

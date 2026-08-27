@@ -18,16 +18,17 @@ class PhantomMockCollection {
   });
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-        'rules': rules.map((r) => r.toJson()).toList(),
-      };
+    'name': name,
+    'description': description,
+    'rules': rules.map((r) => r.toJson()).toList(),
+  };
 
   factory PhantomMockCollection.fromJson(Map<String, dynamic> json) {
     return PhantomMockCollection(
       name: json['name'] as String? ?? 'Phantom Mocks',
       description: json['description'] as String? ?? '',
-      rules: (json['rules'] as List<dynamic>?)
+      rules:
+          (json['rules'] as List<dynamic>?)
               ?.map((r) => PhantomMockRule.fromJson(r as Map<String, dynamic>))
               .toList() ??
           const [],

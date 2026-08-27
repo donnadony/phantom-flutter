@@ -83,10 +83,7 @@ class PhantomMockInterceptor extends ChangeNotifier {
   /// Patterns are matched against the URL *path* (not the full URL) so a
   /// pattern like `/v1/users` is not accidentally satisfied by a query string
   /// or a host that happens to contain the same text.
-  PhantomMockRule? matchingRule({
-    required String method,
-    required String url,
-  }) {
+  PhantomMockRule? matchingRule({required String method, required String url}) {
     final path = _pathOf(url);
     final upperMethod = method.toUpperCase();
     for (final rule in _rules) {
@@ -103,10 +100,7 @@ class PhantomMockInterceptor extends ChangeNotifier {
 
   /// Looks up a mock for [method] [url]. On a hit the call is also recorded in
   /// the Network inspector flagged as MOCK, mirroring phantom-ios.
-  PhantomMockHit? mockResponse({
-    required String method,
-    required String url,
-  }) {
+  PhantomMockHit? mockResponse({required String method, required String url}) {
     final rule = matchingRule(method: method, url: url);
     final response = rule?.activeResponse;
     if (response == null) return null;
@@ -151,9 +145,11 @@ class PhantomMockInterceptor extends ChangeNotifier {
     final collection = PhantomMockCollection.decode(jsonString);
     if (collection == null || collection.rules.isEmpty) return null;
     for (final incoming in collection.rules) {
-      final index = _rules.indexWhere((r) =>
-          r.urlPattern == incoming.urlPattern &&
-          r.httpMethod == incoming.httpMethod);
+      final index = _rules.indexWhere(
+        (r) =>
+            r.urlPattern == incoming.urlPattern &&
+            r.httpMethod == incoming.httpMethod,
+      );
       if (index != -1) {
         _rules[index] = incoming;
       } else {

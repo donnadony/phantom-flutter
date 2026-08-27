@@ -14,9 +14,7 @@ class PhantomJsonTreeView extends StatelessWidget {
     final theme = PhantomThemeProvider.of(context);
     try {
       final parsed = jsonDecode(jsonString);
-      return SingleChildScrollView(
-        child: _buildRootContent(parsed, theme),
-      );
+      return SingleChildScrollView(child: _buildRootContent(parsed, theme));
     } catch (_) {
       return SingleChildScrollView(
         child: Text(
@@ -38,7 +36,11 @@ class PhantomJsonTreeView extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: entries.map((e) {
-          return _JsonNodeView(keyName: e.key.toString(), value: e.value, theme: theme);
+          return _JsonNodeView(
+            keyName: e.key.toString(),
+            value: e.value,
+            theme: theme,
+          );
         }).toList(),
       );
     }
@@ -46,13 +48,21 @@ class PhantomJsonTreeView extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: parsed.asMap().entries.map((e) {
-          return _JsonNodeView(keyName: '[${e.key}]', value: e.value, theme: theme);
+          return _JsonNodeView(
+            keyName: '[${e.key}]',
+            value: e.value,
+            theme: theme,
+          );
         }).toList(),
       );
     }
     return Text(
       parsed.toString(),
-      style: TextStyle(color: theme.onBackground, fontSize: 12, fontFamily: 'monospace'),
+      style: TextStyle(
+        color: theme.onBackground,
+        fontSize: 12,
+        fontFamily: 'monospace',
+      ),
     );
   }
 }
@@ -85,7 +95,8 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
 
   Widget _buildMap(Map<String, dynamic> map) {
     final theme = widget.theme;
-    final entries = map.entries.toList()..sort((a, b) => a.key.compareTo(b.key));
+    final entries = map.entries.toList()
+      ..sort((a, b) => a.key.compareTo(b.key));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,20 +110,38 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
               children: [
                 Text(
                   _expanded ? '⊟ ' : '⊞ ',
-                  style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackgroundVariant,
+                    fontSize: 14,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 Text(
                   '{} ',
-                  style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackgroundVariant,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 Text(
                   widget.keyName,
-                  style: TextStyle(color: theme.onBackground, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 if (!_expanded)
                   Text(
                     ' (${entries.length})',
-                    style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11, fontFamily: 'monospace'),
+                    style: TextStyle(
+                      color: theme.onBackgroundVariant,
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                    ),
                   ),
               ],
             ),
@@ -124,7 +153,11 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: entries.map((e) {
-                return _JsonNodeView(keyName: e.key, value: e.value, theme: theme);
+                return _JsonNodeView(
+                  keyName: e.key,
+                  value: e.value,
+                  theme: theme,
+                );
               }).toList(),
             ),
           ),
@@ -147,19 +180,37 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
               children: [
                 Text(
                   _expanded ? '⊟ ' : '⊞ ',
-                  style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackgroundVariant,
+                    fontSize: 14,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 Text(
                   '[] ',
-                  style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackgroundVariant,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 Text(
                   widget.keyName,
-                  style: TextStyle(color: theme.onBackground, fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackground,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'monospace',
+                  ),
                 ),
                 Text(
                   ' [${arr.length}]',
-                  style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11, fontFamily: 'monospace'),
+                  style: TextStyle(
+                    color: theme.onBackgroundVariant,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  ),
                 ),
               ],
             ),
@@ -171,7 +222,11 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: arr.asMap().entries.map((e) {
-                return _JsonNodeView(keyName: '[${e.key}]', value: e.value, theme: theme);
+                return _JsonNodeView(
+                  keyName: '[${e.key}]',
+                  value: e.value,
+                  theme: theme,
+                );
               }).toList(),
             ),
           ),
@@ -191,16 +246,29 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
         children: [
           Text(
             widget.keyName,
-            style: TextStyle(color: theme.onBackground, fontSize: 12, fontWeight: FontWeight.w500, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: theme.onBackground,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'monospace',
+            ),
           ),
           Text(
             ' : ',
-            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12, fontFamily: 'monospace'),
+            style: TextStyle(
+              color: theme.onBackgroundVariant,
+              fontSize: 12,
+              fontFamily: 'monospace',
+            ),
           ),
           Flexible(
             child: Text(
               displayValue,
-              style: TextStyle(color: color, fontSize: 12, fontFamily: 'monospace'),
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontFamily: 'monospace',
+              ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),

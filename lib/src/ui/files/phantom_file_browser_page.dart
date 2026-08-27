@@ -56,19 +56,24 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
   Future<List<_FileItem>> _loadRoots() async {
     final roots = <_FileItem>[];
 
-    Future<void> add(String label, Future<Directory?> Function() resolve) async {
+    Future<void> add(
+      String label,
+      Future<Directory?> Function() resolve,
+    ) async {
       try {
         final dir = await resolve();
         if (dir == null || !dir.existsSync()) return;
         if (roots.any((r) => r.entity.path == dir.path)) return;
-        roots.add(_FileItem(
-          name: label,
-          entity: dir,
-          isDirectory: true,
-          size: 0,
-          modifiedDate: dir.statSync().modified,
-          subtitleOverride: dir.path,
-        ));
+        roots.add(
+          _FileItem(
+            name: label,
+            entity: dir,
+            isDirectory: true,
+            size: 0,
+            modifiedDate: dir.statSync().modified,
+            subtitleOverride: dir.path,
+          ),
+        );
       } catch (_) {
         // Root not available on this platform — skip it.
       }
@@ -100,13 +105,15 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
       } catch (_) {
         continue;
       }
-      items.add(_FileItem(
-        name: name,
-        entity: entity,
-        isDirectory: stat.type == FileSystemEntityType.directory,
-        size: stat.size,
-        modifiedDate: stat.modified,
-      ));
+      items.add(
+        _FileItem(
+          name: name,
+          entity: entity,
+          isDirectory: stat.type == FileSystemEntityType.directory,
+          size: stat.size,
+          modifiedDate: stat.modified,
+        ),
+      );
     }
 
     items.sort((a, b) {
@@ -127,8 +134,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           widget.title ?? 'File Browser',
-          style:
-              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -166,8 +175,7 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
             const SizedBox(height: 12),
             Text(
               'Empty directory',
-              style:
-                  TextStyle(color: theme.onBackgroundVariant, fontSize: 14),
+              style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14),
             ),
           ],
         ),
@@ -224,8 +232,9 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
                     style: TextStyle(
                       color: theme.onBackground,
                       fontSize: 14,
-                      fontWeight:
-                          item.isDirectory ? FontWeight.w600 : FontWeight.normal,
+                      fontWeight: item.isDirectory
+                          ? FontWeight.w600
+                          : FontWeight.normal,
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -244,8 +253,11 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
               ),
             ),
             if (item.isDirectory)
-              Icon(Icons.chevron_right,
-                  color: theme.onBackgroundVariant, size: 16),
+              Icon(
+                Icons.chevron_right,
+                color: theme.onBackgroundVariant,
+                size: 16,
+              ),
           ],
         ),
       ),
@@ -313,8 +325,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
             if (canPreview)
               ListTile(
                 leading: Icon(Icons.visibility, color: theme.info, size: 20),
-                title: Text('Preview',
-                    style: TextStyle(color: theme.onBackground, fontSize: 14)),
+                title: Text(
+                  'Preview',
+                  style: TextStyle(color: theme.onBackground, fontSize: 14),
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   _previewFile(item, theme);
@@ -322,8 +336,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
               ),
             ListTile(
               leading: Icon(Icons.delete_outline, color: theme.error, size: 20),
-              title: Text('Delete',
-                  style: TextStyle(color: theme.error, fontSize: 14)),
+              title: Text(
+                'Delete',
+                style: TextStyle(color: theme.error, fontSize: 14),
+              ),
               onTap: () {
                 Navigator.pop(ctx);
                 _confirmDelete(item, theme);
@@ -341,8 +357,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: theme.surface,
-        title: Text('Delete ${item.name}?',
-            style: TextStyle(color: theme.onBackground, fontSize: 16)),
+        title: Text(
+          'Delete ${item.name}?',
+          style: TextStyle(color: theme.onBackground, fontSize: 16),
+        ),
         content: Text(
           'This action cannot be undone.',
           style: TextStyle(color: theme.onBackgroundVariant, fontSize: 13),
@@ -350,8 +368,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel',
-                style: TextStyle(color: theme.onBackgroundVariant)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: theme.onBackgroundVariant),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -361,9 +381,10 @@ class _PhantomFileBrowserPageState extends State<PhantomFileBrowserPage> {
               } catch (_) {}
               await _load();
             },
-            child: Text('Delete',
-                style: TextStyle(
-                    color: theme.error, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: theme.error, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -388,8 +409,10 @@ class _FilePreviewPage extends StatelessWidget {
         foregroundColor: theme.onBackground,
         title: Text(
           title,
-          style:
-              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: SingleChildScrollView(

@@ -18,7 +18,12 @@ abstract class PhantomDioInterceptorBase {
     required dynamic data,
     required int hashCode,
     required void Function() continueRequest,
-    required void Function(int statusCode, dynamic data, Map<String, dynamic> headers) rejectWithMock,
+    required void Function(
+      int statusCode,
+      dynamic data,
+      Map<String, dynamic> headers,
+    )
+    rejectWithMock,
   }) {
     final headersStr = _formatHeaders(headers);
     final bodyStr = _formatBody(data);
@@ -79,8 +84,9 @@ abstract class PhantomDioInterceptorBase {
     final durationMs = startTime != null
         ? DateTime.now().difference(startTime).inMilliseconds
         : null;
-    final bodyStr =
-        responseData != null ? _formatBody(responseData) : errorMessage;
+    final bodyStr = responseData != null
+        ? _formatBody(responseData)
+        : errorMessage;
 
     _networkLogger.logError(
       url: url,

@@ -56,10 +56,16 @@ void main() {
 
     final panel = tester.getRect(find.byType(ClipRRect).first);
 
-    expect(panel.top, greaterThan(47),
-        reason: 'the sheet must clear the status bar');
-    expect(panel.top, lessThan(80),
-        reason: 'but only by a sliver, not a wide band');
+    expect(
+      panel.top,
+      greaterThan(47),
+      reason: 'the sheet must clear the status bar',
+    );
+    expect(
+      panel.top,
+      lessThan(80),
+      reason: 'but only by a sliver, not a wide band',
+    );
     expect(panel.bottom, closeTo(800, 0.5));
   });
 
@@ -143,12 +149,18 @@ void main() {
       await tester.pumpAndSettle();
 
       final panel = tester.getRect(find.byType(ClipRRect).first);
-      expect(panel.bottom, closeTo(800 - 336, 0.5),
-          reason: 'the sheet should sit on top of the keyboard');
+      expect(
+        panel.bottom,
+        closeTo(800 - 336, 0.5),
+        reason: 'the sheet should sit on top of the keyboard',
+      );
 
       final body = tester.getRect(find.byType(PhantomViewBody));
-      expect(body.height, greaterThan(0),
-          reason: 'the panel contents must survive an open keyboard');
+      expect(
+        body.height,
+        greaterThan(0),
+        reason: 'the panel contents must survive an open keyboard',
+      );
     });
 
     testWidgets('the status bar does not pad the panel from the inside', (
