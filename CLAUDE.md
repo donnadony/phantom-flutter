@@ -18,7 +18,7 @@ dependencies:
   phantom_flutter:
     git:
       url: https://github.com/donnadony/phantom-flutter.git
-      ref: v0.0.3
+      ref: v0.0.4
 ```
 
 Then run `flutter pub get`.

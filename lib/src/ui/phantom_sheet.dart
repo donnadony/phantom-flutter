@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../theme/phantom_theme.dart';
@@ -30,7 +32,19 @@ class PhantomSheet extends StatefulWidget {
     this.initialSize = 0.5,
     this.minSize = 0.25,
     this.maxSize = 1.0,
-  });
+  }) : assert(
+         initialSize >= minSize,
+         'initialSize must be at least minSize, or the sheet opens already '
+         'below its close threshold and dismisses on the first touch.',
+       ),
+       assert(
+         maxSize >= initialSize,
+         'maxSize must be at least initialSize.',
+       ),
+       assert(
+         maxSize <= 1.0 && minSize > 0,
+         'Sizes are fractions of the screen, between 0 and 1.',
+       );
 
   final PhantomTheme theme;
   final VoidCallback onClose;
@@ -55,7 +69,12 @@ class _PhantomSheetState extends State<PhantomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final maxHeight = MediaQuery.of(context).size.height;
+    final media = MediaQuery.of(context);
+    final maxHeight = media.size.height;
+    // The panel is anchored to the bottom, so an open keyboard would sit on
+    // top of it. Lift it by the inset and cap its height to what is left.
+    final keyboard = media.viewInsets.bottom;
+    final height = math.min(maxHeight * _size, maxHeight - keyboard);
 
     return Stack(
       children: [
@@ -73,8 +92,8 @@ class _PhantomSheetState extends State<PhantomSheet> {
           curve: Curves.easeOutCubic,
           left: 0,
           right: 0,
-          bottom: 0,
-          height: maxHeight * _size,
+          bottom: keyboard,
+          height: height,
           child: _panel(maxHeight),
         ),
       ],
@@ -92,7 +111,11 @@ class _PhantomSheetState extends State<PhantomSheet> {
               theme: widget.theme,
               onDragStart: () => setState(() => _dragging = true),
               onDragUpdate: (dy) => setState(() {
-                _size = (_size - dy / maxHeight).clamp(0.1, widget.maxSize);
+                // Floor below minSize, not a constant: the drag has to be
+                // able to cross the close threshold for the gesture to work
+                // at all, whatever minSize the caller chose.
+                _size = (_size - dy / maxHeight)
+                    .clamp(widget.minSize / 2, widget.maxSize);
               }),
               onDragEnd: _settle,
             ),
@@ -105,6 +128,32 @@ class _PhantomSheetState extends State<PhantomSheet> {
                   // A nested MaterialApp for its Navigator: without one, the
                   // panel's pushes land on the app's root navigator and cover
                   // the screen the sheet exists to sit beside.
+                  //
+                  // It builds its MediaQuery from the FlutterView, so it
+                  // inherits the window's padding and insets no matter what
+                  // this subtree wraps it in — hence stripping them here,
+                  // inside, where it also reaches every pushed route:
+                  //  - top padding would push the panel's AppBar down by the
+                  //    status bar height, although the sheet's edge is
+                  //    nowhere near it;
+                  //  - the bottom inset is already handled by lifting the
+                  //    whole sheet, and applying it again in here would
+                  //    collapse the content to nothing.
+                  builder: (context, child) {
+                    // One copyWith rather than nested remove* helpers: each of
+                    // those reads the MediaQuery at the context it is given,
+                    // so nesting them with the same context makes the inner
+                    // one restore what the outer just stripped.
+                    final media = MediaQuery.of(context);
+                    return MediaQuery(
+                      data: media.copyWith(
+                        padding: media.padding.copyWith(top: 0),
+                        viewPadding: media.viewPadding.copyWith(top: 0),
+                        viewInsets: media.viewInsets.copyWith(bottom: 0),
+                      ),
+                      child: child!,
+                    );
+                  },
                   home: PhantomView(onClose: widget.onClose),
                 ),
               ),
@@ -118,6 +167,13 @@ class _PhantomSheetState extends State<PhantomSheet> {
   /// Snap to whichever height is nearer, or close if dragged down past [minSize].
   void _settle() {
     if (_size < widget.minSize) {
+      // Reset before closing: PhantomSheet is exported, and a caller whose
+      // onClose hides it rather than unmounting it would otherwise get the
+      // sheet back mid-drag and below its close threshold.
+      setState(() {
+        _dragging = false;
+        _size = widget.initialSize;
+      });
       widget.onClose();
       return;
     }
