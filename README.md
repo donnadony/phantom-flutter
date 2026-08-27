@@ -38,6 +38,10 @@ A cross-platform debug toolkit for Flutter apps. Inspect logs, network requests,
 - **Device Info** — View app version, device model, OS version, screen size
 - **SharedPreferences Viewer** — Browse, edit, add, and delete stored preferences
 - **Localization** — Bilingual string management (English/Spanish) with language switching
+- **File Browser** — Browse the app sandbox, inspect file sizes and dates, preview and delete files
+- **Deep Link Tester** — Fire URL schemes and universal links at the app, with a persisted history
+- **Export / Import** — Share logs, network captures, and mock collections as JSON; import mock collections from a file
+- **Configurable menu** — Choose which modules appear, and append your own entries
 
 ## Installation
 
@@ -246,7 +250,7 @@ No setup required — accessible from the Phantom debug panel.
 - **Filter**: All, App (excludes system keys), Phantom (`phantom_` prefixed)
 - **Type badges**: String, Int, Double, Bool, List
 - **Inline toggle** for Bool entries
-- **Tap to edit** String values
+- **Tap to edit**, with an explicit type (String, Int, Double, Bool) so values keep their type
 - **Long-press** for context menu: Copy Key, Copy Value, Delete
 - **Add** new entries via the "+" button
 - **Clear** filtered entries
@@ -331,6 +335,10 @@ phantom_flutter/
 | `shared_preferences` | Persist mock rules, config overrides, language |
 | `package_info_plus` | App version, build number, package name |
 | `device_info_plus` | Device model, OS version |
+| `path_provider` | File browser roots, app storage stats |
+| `url_launcher` | Deep link tester |
+| `share_plus` | Exporting logs, network captures, and mocks |
+| `file_picker` | Importing mock collections |
 
 All are first-party Flutter community packages. No third-party dependencies.
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/phantom_log_item.dart';
 import '../../core/phantom_logger.dart';
 import '../../theme/phantom_theme.dart';
+import '../../utils/phantom_exporter.dart';
 
 class PhantomLogsPage extends StatefulWidget {
   const PhantomLogsPage({super.key});
@@ -14,7 +15,7 @@ class PhantomLogsPage extends StatefulWidget {
 class _PhantomLogsPageState extends State<PhantomLogsPage> {
   final _logger = PhantomLogger.instance;
   String _searchText = '';
-  String _selectedFilter = 'All';
+  PhantomLogLevel? _selectedLevel;
 
   @override
   void initState() {
@@ -32,11 +33,8 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
 
   List<PhantomLogItem> get _filteredLogs {
     var list = _logger.logs;
-    if (_selectedFilter != 'All') {
-      final level = _filterLevel(_selectedFilter);
-      if (level != null) {
-        list = list.where((l) => l.level == level).toList();
-      }
+    if (_selectedLevel != null) {
+      list = list.where((l) => l.level == _selectedLevel).toList();
     }
     if (_searchText.isNotEmpty) {
       final query = _searchText.toLowerCase();
@@ -46,19 +44,6 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
       }).toList();
     }
     return list;
-  }
-
-  PhantomLogLevel? _filterLevel(String filter) {
-    switch (filter) {
-      case 'Info':
-        return PhantomLogLevel.info;
-      case 'Warning':
-        return PhantomLogLevel.warning;
-      case 'Error':
-        return PhantomLogLevel.error;
-      default:
-        return null;
-    }
   }
 
   @override
@@ -76,6 +61,12 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
           style: TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
         ),
         actions: [
+          if (_logger.logs.isNotEmpty)
+            IconButton(
+              tooltip: 'Export logs',
+              icon: Icon(Icons.ios_share, color: theme.primary, size: 20),
+              onPressed: _exportLogs,
+            ),
           TextButton(
             onPressed: _logger.clearAll,
             child: Text('Clear', style: TextStyle(color: theme.error, fontWeight: FontWeight.w600)),
@@ -88,6 +79,21 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
           _buildFilters(theme),
           Expanded(child: _buildList(logs, theme)),
         ],
+      ),
+    );
+  }
+
+  Future<void> _exportLogs() async {
+    final shared = await PhantomExporter.share(
+      contents: PhantomExporter.encodeLogs(_logger.logs),
+      fileName: 'phantom_logs.json',
+      subject: 'Phantom logs',
+    );
+    if (!mounted || shared) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not export logs'),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
@@ -125,16 +131,16 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
   }
 
   Widget _buildFilters(PhantomTheme theme) {
-    const filters = ['All', 'Info', 'Warning', 'Error'];
+    final filters = <PhantomLogLevel?>[null, ...PhantomLogLevel.values];
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
-        children: filters.map((f) {
-          final selected = _selectedFilter == f;
+        children: filters.map((level) {
+          final selected = _selectedLevel == level;
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: GestureDetector(
-              onTap: () => setState(() => _selectedFilter = f),
+              onTap: () => setState(() => _selectedLevel = level),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
@@ -142,7 +148,7 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  f,
+                  level?.label ?? 'All',
                   style: TextStyle(
                     color: selected ? theme.onPrimary : theme.onBackground,
                     fontSize: 12,
@@ -184,17 +190,10 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
         children: [
           Row(
             children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _levelColor(item.level, theme),
-                ),
-              ),
-              const SizedBox(width: 8),
+              Text(item.level.emoji, style: const TextStyle(fontSize: 11)),
+              const SizedBox(width: 6),
               Text(
-                item.level.name.toUpperCase(),
+                item.level.label,
                 style: TextStyle(
                   color: _levelColor(item.level, theme),
                   fontSize: 11,

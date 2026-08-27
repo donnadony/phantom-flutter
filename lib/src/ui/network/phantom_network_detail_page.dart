@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,6 +10,8 @@ import '../../utils/json_formatter.dart';
 import '../mock/phantom_mock_edit_page.dart';
 import 'phantom_json_tree_view.dart';
 
+enum _DetailTab { request, response, headers }
+
 class PhantomNetworkDetailPage extends StatefulWidget {
   final PhantomNetworkItem item;
 
@@ -22,17 +22,42 @@ class PhantomNetworkDetailPage extends StatefulWidget {
       _PhantomNetworkDetailPageState();
 }
 
-enum _DetailTab { request, response, headers }
-
 class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
+  final _interceptor = PhantomMockInterceptor.instance;
+
   _DetailTab _selectedTab = _DetailTab.response;
-  final bool _showFormatted = true;
+  bool _showJsonTree = true;
   String? _copiedMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _interceptor.addListener(_onUpdate);
+  }
+
+  @override
+  void dispose() {
+    _interceptor.removeListener(_onUpdate);
+    super.dispose();
+  }
+
+  void _onUpdate() {
+    if (mounted) setState(() {});
+  }
+
+  PhantomNetworkItem get _item => widget.item;
+
+  PhantomMockRule? get _existingRule => _item.url == null
+      ? null
+      : _interceptor.ruleForEndpoint(
+          method: _item.methodType,
+          url: _item.url!,
+        );
 
   @override
   Widget build(BuildContext context) {
     final theme = PhantomThemeProvider.of(context);
-    final item = widget.item;
+    final status = _item.statusCode;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -40,23 +65,30 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         backgroundColor: theme.background,
         foregroundColor: theme.onBackground,
         title: Text(
-          '${item.methodType} ${item.statusCode != null ? item.statusCode.toString() : ''}',
-          style: TextStyle(
-              color: theme.onBackground, fontWeight: FontWeight.bold),
+          '${_item.methodType}${status != null ? ' $status' : ''}',
+          style:
+              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Copy URL',
+            icon: Icon(Icons.link, color: theme.onBackground, size: 20),
+            onPressed: () => _copy(_item.url ?? '', 'URL copied'),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          _buildUrlHeader(item, theme),
+          _buildUrlHeader(theme),
           _buildTabBar(theme),
-          Expanded(child: _buildContent(item, theme)),
-          _buildActions(item, theme),
+          Expanded(child: _buildContent(theme)),
+          _buildActions(theme),
         ],
       ),
     );
   }
 
-  Widget _buildUrlHeader(PhantomNetworkItem item, PhantomTheme theme) {
+  Widget _buildUrlHeader(PhantomTheme theme) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -68,49 +100,66 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            item.url ?? 'No URL',
+          SelectableText(
+            _item.url ?? 'No URL',
             style: TextStyle(color: theme.onBackground, fontSize: 13),
           ),
           const SizedBox(height: 6),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              if (item.statusCode != null) ...[
+              if (_item.statusCode != null)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: theme.statusBackgroundColor(item.statusCode!),
+                    color: theme.statusBackgroundColor(_item.statusCode!),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    '${item.statusCode}',
+                    '${_item.statusCode}',
                     style: TextStyle(
-                      color: theme.statusColor(item.statusCode!),
+                      color: theme.statusColor(_item.statusCode!),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
-              ],
-              if (item.durationMs != null)
+              if (_item.durationMs != null)
                 Text(
-                  '${item.durationMs}ms',
+                  '${_item.durationMs}ms',
                   style: TextStyle(
-                    color: item.durationMs! > 1000
+                    color: _item.durationMs! > 1000
                         ? theme.error
                         : theme.onBackgroundVariant,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              const SizedBox(width: 8),
-              if (item.responseSizeBytes > 0)
+              if (_item.responseSizeBytes > 0)
                 Text(
-                  _formatBytes(item.responseSizeBytes),
+                  _formatBytes(_item.responseSizeBytes),
                   style: TextStyle(
                       color: theme.onBackgroundVariant, fontSize: 12),
+                ),
+              if (_item.isMock)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.warning,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'MOCK',
+                    style: TextStyle(
+                      color: theme.onPrimary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -132,6 +181,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
           final selected = _selectedTab == tab;
           return Expanded(
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => setState(() => _selectedTab = tab),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 8),
@@ -143,7 +193,8 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                   tab.name[0].toUpperCase() + tab.name.substring(1),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: selected ? theme.background : theme.onBackgroundVariant,
+                    color:
+                        selected ? theme.background : theme.onBackgroundVariant,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -156,24 +207,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
     );
   }
 
-  Widget _buildContent(PhantomNetworkItem item, PhantomTheme theme) {
-    String text;
-    switch (_selectedTab) {
-      case _DetailTab.request:
-        text = item.requestBody.isEmpty ? 'No request body' : item.requestBody;
-        break;
-      case _DetailTab.response:
-        text =
-            item.responseBody.isEmpty ? 'No response body' : item.responseBody;
-        break;
-      case _DetailTab.headers:
-        text =
-            'Request Headers:\n${item.requestHeaders}\n\nResponse Headers:\n${item.responseHeaders}';
-        break;
-    }
-
-    final isJson = _selectedTab != _DetailTab.headers && _isJson(text);
-
+  Widget _buildContent(PhantomTheme theme) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.all(16),
@@ -185,101 +219,177 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => _copyText(text),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.copy_rounded, color: theme.info, size: 14),
-                    const SizedBox(width: 4),
-                    Text(
-                      _copiedMessage ?? 'Copy',
-                      style: TextStyle(
-                        color: theme.info,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          _buildViewToggle(theme),
           const SizedBox(height: 8),
           Expanded(
-            child: _showFormatted && isJson
-                ? PhantomJsonTreeView(jsonString: text)
-                : SingleChildScrollView(
-                    child: Text(
-                      prettyPrintJson(text) ?? text,
+            child: SingleChildScrollView(
+              child: _showJsonTree
+                  ? _buildTreeContent(theme)
+                  : SelectableText(
+                      _plainText,
                       style: TextStyle(
                         color: theme.onBackground,
                         fontSize: 12,
                         fontFamily: 'monospace',
                       ),
                     ),
-                  ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActions(PhantomNetworkItem item, PhantomTheme theme) {
+  Widget _buildViewToggle(PhantomTheme theme) {
+    Widget option(String label, bool selected, VoidCallback onTap) {
+      return GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: selected ? theme.surfaceVariant : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? theme.onBackground : theme.onBackgroundVariant,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: theme.inputBackground,
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            children: [
+              option('Viewer', _showJsonTree,
+                  () => setState(() => _showJsonTree = true)),
+              option('Text', !_showJsonTree,
+                  () => setState(() => _showJsonTree = false)),
+            ],
+          ),
+        ),
+        const Spacer(),
+        GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => _copy(_plainText, 'Copied'),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _copiedMessage != null ? Icons.check : Icons.copy_rounded,
+                color: theme.info,
+                size: 14,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                _copiedMessage ?? 'Copy',
+                style: TextStyle(
+                  color: theme.info,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTreeContent(PhantomTheme theme) {
+    switch (_selectedTab) {
+      case _DetailTab.request:
+        return PhantomJsonTreeView(jsonString: _requestText);
+      case _DetailTab.response:
+        return PhantomJsonTreeView(jsonString: _responseText);
+      case _DetailTab.headers:
+        return _buildHeadersTree(theme);
+    }
+  }
+
+  Widget _buildHeadersTree(PhantomTheme theme) {
+    final hasRequest = _hasHeaders(_item.requestHeaders);
+    final hasResponse = _hasHeaders(_item.responseHeaders);
+
+    if (!hasRequest && !hasResponse) {
+      return Text(
+        'No headers',
+        style: TextStyle(
+          color: theme.onBackgroundVariant,
+          fontSize: 12,
+          fontFamily: 'monospace',
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (hasRequest) ...[
+          Text(
+            'Request Headers',
+            style: TextStyle(
+                color: theme.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          PhantomJsonTreeView(
+              jsonString: headersAsJson(_item.requestHeaders)),
+          const SizedBox(height: 12),
+        ],
+        if (hasResponse) ...[
+          Text(
+            'Response Headers',
+            style: TextStyle(
+                color: theme.primary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          PhantomJsonTreeView(
+              jsonString: headersAsJson(_item.responseHeaders)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildActions(PhantomTheme theme) {
+    final existing = _existingRule;
+    final hasRule = existing != null || _item.isMock;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Row(
         children: [
           Expanded(
-            child: GestureDetector(
-              onTap: () => _createMock(item, theme),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: theme.info,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Mock this',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: theme.onPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+            child: _actionButton(
+              label: hasRule ? 'Edit Mock' : 'Mock this',
+              color: hasRule ? theme.warning : theme.info,
+              theme: theme,
+              onTap: () => hasRule && existing != null
+                  ? _editMock(existing, theme)
+                  : _createMock(theme),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: GestureDetector(
-              onTap: () {
-                final curl = buildCurlCommand(item);
-                Clipboard.setData(ClipboardData(text: curl));
-                _showCopied('cURL copied');
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  color: theme.success,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Copy cURL',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: theme.onPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+            child: _actionButton(
+              label: 'Copy cURL',
+              color: theme.success,
+              theme: theme,
+              onTap: () => _copy(buildCurlCommand(_item), 'cURL copied'),
             ),
           ),
         ],
@@ -287,63 +397,120 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
     );
   }
 
-  void _createMock(PhantomNetworkItem item, PhantomTheme theme) {
-    final uri = item.url != null ? Uri.tryParse(item.url!) : null;
-    final path = uri?.path ?? '';
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
+  Widget _actionButton({
+    required String label,
+    required Color color,
+    required PhantomTheme theme,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: theme.onPrimary,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // MARK: - Content helpers
+
+  String get _requestText =>
+      _item.requestBody.isEmpty ? 'No request body' : _item.requestBody;
+
+  String get _responseText =>
+      _item.responseBody.isEmpty ? 'No response body' : _item.responseBody;
+
+  String get _plainText {
+    switch (_selectedTab) {
+      case _DetailTab.request:
+        return prettyPrintJson(_requestText) ?? _requestText;
+      case _DetailTab.response:
+        return prettyPrintJson(_responseText) ?? _responseText;
+      case _DetailTab.headers:
+        return 'Request Headers:\n${_item.requestHeaders}\n\n'
+            'Response Headers:\n${_item.responseHeaders}';
+    }
+  }
+
+  bool _hasHeaders(String headers) {
+    final trimmed = headers.trim();
+    return trimmed.isNotEmpty && trimmed != 'No headers';
+  }
+
+  // MARK: - Actions
+
+  void _createMock(PhantomTheme theme) {
+    final path = _item.path;
+    final id = DateTime.now().microsecondsSinceEpoch.toString();
     final responseId = '${id}_r';
+    final segments = path.split('/').where((s) => s.isNotEmpty);
+
     final rule = PhantomMockRule(
       id: id,
       urlPattern: path,
-      httpMethod: item.methodType,
+      httpMethod: _item.methodType,
       responses: [
         PhantomMockResponse(
           id: responseId,
           name: 'Response 1',
-          httpMethod: item.methodType,
-          statusCode: item.statusCode ?? 200,
-          responseBody: item.responseBody,
+          httpMethod: _item.methodType,
+          statusCode: _item.statusCode ?? 200,
+          responseBody: _prettyBody(_item.responseBody),
         ),
       ],
       activeResponseId: responseId,
-      ruleDescription: 'Mock ${path.split('/').last}',
+      ruleDescription:
+          'Mock ${segments.isEmpty ? 'endpoint' : segments.last}',
     );
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PhantomThemeProvider(
           theme: theme,
           child: PhantomMockEditPage(
             existingRule: rule,
-            onSave: (savedRule) {
-              PhantomMockInterceptor.instance.addRule(savedRule);
-            },
+            onSave: PhantomMockInterceptor.instance.addRule,
           ),
         ),
       ),
     );
   }
 
-  bool _isJson(String text) {
-    final trimmed = text.trim();
-    if (trimmed.isEmpty) return false;
-    if (!((trimmed.startsWith('{') && trimmed.endsWith('}')) ||
-        (trimmed.startsWith('[') && trimmed.endsWith(']')))) {
-      return false;
-    }
-    try {
-      jsonDecode(trimmed);
-      return true;
-    } catch (_) {
-      return false;
-    }
+  void _editMock(PhantomMockRule rule, PhantomTheme theme) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PhantomThemeProvider(
+          theme: theme,
+          child: PhantomMockEditPage(
+            existingRule: rule,
+            onSave: PhantomMockInterceptor.instance.updateRule,
+            onDelete: () => PhantomMockInterceptor.instance.deleteRule(rule.id),
+          ),
+        ),
+      ),
+    );
   }
 
-  void _copyText(String text) {
+  String _prettyBody(String body) {
+    if (body.isEmpty) return '{\n  \n}';
+    return prettyPrintJson(body) ?? body;
+  }
+
+  void _copy(String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
-    _showCopied('Copied');
-  }
-
-  void _showCopied(String message) {
     setState(() => _copiedMessage = message);
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copiedMessage = null);

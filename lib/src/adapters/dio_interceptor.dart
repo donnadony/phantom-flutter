@@ -23,28 +23,22 @@ abstract class PhantomDioInterceptorBase {
     final headersStr = _formatHeaders(headers);
     final bodyStr = _formatBody(data);
 
-    final mock = _mockInterceptor.mockResponse(method: method, url: url);
-    if (mock != null) {
-      _networkLogger.completeRequest(
-        method: method,
-        url: url,
-        requestHeaders: headersStr,
-        requestBody: bodyStr,
-        statusCode: mock.statusCode,
-        responseHeaders: mock.headers,
-        responseBody: mock.body,
-        durationMs: 0,
-      );
-      rejectWithMock(mock.statusCode, mock.body, {'X-Phantom-Mock': 'true'});
-      return;
-    }
-
+    // Log the request first so a mock hit completes this entry (carrying the
+    // real request headers/body) instead of appending a second, bare one —
+    // mockResponse records the response side itself.
     _networkLogger.logRequest(
       method: method,
       url: url,
       headers: headersStr,
       body: bodyStr,
     );
+
+    final mock = _mockInterceptor.mockResponse(method: method, url: url);
+    if (mock != null) {
+      rejectWithMock(mock.statusCode, mock.body, {'X-Phantom-Mock': 'true'});
+      return;
+    }
+
     _requestTimestamps[hashCode] = DateTime.now();
     continueRequest();
   }
@@ -85,13 +79,14 @@ abstract class PhantomDioInterceptorBase {
     final durationMs = startTime != null
         ? DateTime.now().difference(startTime).inMilliseconds
         : null;
-    final bodyStr = responseData != null ? _formatBody(responseData) : errorMessage;
+    final bodyStr =
+        responseData != null ? _formatBody(responseData) : errorMessage;
 
-    _networkLogger.logResponse(
+    _networkLogger.logError(
       url: url,
-      statusCode: statusCode ?? 0,
+      errorMessage: bodyStr,
+      statusCode: statusCode,
       headers: 'Error',
-      body: bodyStr,
       durationMs: durationMs,
     );
   }

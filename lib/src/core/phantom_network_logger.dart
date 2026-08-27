@@ -47,6 +47,7 @@ class PhantomNetworkLogger extends ChangeNotifier {
     String headers = 'No headers',
     String body = '',
     int? durationMs,
+    bool isMock = false,
   }) {
     final index = _indexOfPendingByUrl(url);
     final now = DateTime.now();
@@ -63,6 +64,7 @@ class PhantomNetworkLogger extends ChangeNotifier {
         responseSizeBytes: responseSize,
         completedAt: now,
         durationMs: duration,
+        isMock: isMock ? true : null,
       );
       _removePending(existing.id);
     } else {
@@ -77,9 +79,28 @@ class PhantomNetworkLogger extends ChangeNotifier {
         completedAt: now,
         durationMs: durationMs,
         createdAt: now,
+        isMock: isMock,
       ));
     }
     notifyListeners();
+  }
+
+  /// Records a failed request (timeout, socket error, cancellation) against its
+  /// pending entry so it stops showing as PENDING forever.
+  void logError({
+    required String url,
+    required String errorMessage,
+    int? statusCode,
+    String headers = 'No headers',
+    int? durationMs,
+  }) {
+    logResponse(
+      url: url,
+      statusCode: statusCode ?? -1,
+      headers: headers,
+      body: errorMessage,
+      durationMs: durationMs,
+    );
   }
 
   void completeRequest({
@@ -91,6 +112,7 @@ class PhantomNetworkLogger extends ChangeNotifier {
     String responseHeaders = 'No headers',
     String responseBody = '',
     int? durationMs,
+    bool isMock = false,
   }) {
     final index = _indexOfPending(method: method, url: url, body: requestBody);
     final now = DateTime.now();
@@ -107,11 +129,13 @@ class PhantomNetworkLogger extends ChangeNotifier {
         responseSizeBytes: responseSize,
         completedAt: now,
         durationMs: duration,
+        isMock: isMock ? true : null,
       );
       _removePending(existing.id);
     } else {
-      final createdAt =
-          durationMs != null ? now.subtract(Duration(milliseconds: durationMs)) : now;
+      final createdAt = durationMs != null
+          ? now.subtract(Duration(milliseconds: durationMs))
+          : now;
       _items.add(PhantomNetworkItem(
         id: _nextId(),
         url: url,
@@ -125,12 +149,50 @@ class PhantomNetworkLogger extends ChangeNotifier {
         completedAt: now,
         durationMs: durationMs,
         createdAt: createdAt,
+        isMock: isMock,
       ));
     }
     notifyListeners();
   }
 
-  void logExternalEntry(Map<String, dynamic> data, {String sourcePrefix = '[External]'}) {
+  /// Called by [PhantomMockInterceptor] when a request is served from a mock so
+  /// the intercepted call still shows up in the Network list, flagged as MOCK.
+  void logMockResponse({
+    required String method,
+    required String url,
+    required int statusCode,
+    String headers = 'Content-Type: application/json',
+    String body = '',
+  }) {
+    completeRequest(
+      method: method,
+      url: url,
+      statusCode: statusCode,
+      responseHeaders: headers,
+      responseBody: body,
+      durationMs: 0,
+      isMock: true,
+    );
+  }
+
+  /// Attaches status/headers to an in-flight entry without completing it, for
+  /// HTTP clients that surface response metadata before the body.
+  void updateResponseMetadata({
+    required String url,
+    String headers = 'No headers',
+    int? statusCode,
+  }) {
+    final index = _indexOfPendingByUrl(url) ?? _indexOfLatestWithoutStatus(url);
+    if (index == null) return;
+    _items[index] = _items[index].copyWith(
+      responseHeaders: headers,
+      statusCode: statusCode,
+    );
+    notifyListeners();
+  }
+
+  void logExternalEntry(Map<String, dynamic> data,
+      {String sourcePrefix = '[External]'}) {
     final url = data['url'] as String? ?? '';
     final method = data['method'] as String? ?? 'GET';
     final statusCode = data['statusCode'] as int?;
@@ -139,8 +201,9 @@ class PhantomNetworkLogger extends ChangeNotifier {
     final responseSizeBytes = data['responseSizeBytes'] as int? ?? 0;
     final durationMs = data['durationMs'] as int?;
     final now = DateTime.now();
-    final createdAt =
-        durationMs != null ? now.subtract(Duration(milliseconds: durationMs)) : now;
+    final createdAt = durationMs != null
+        ? now.subtract(Duration(milliseconds: durationMs))
+        : now;
 
     _items.add(PhantomNetworkItem(
       id: _nextId(),
@@ -214,6 +277,13 @@ class PhantomNetworkLogger extends ChangeNotifier {
       final index =
           _items.indexWhere((item) => item.id == id && item.isPending);
       if (index != -1) return index;
+    }
+    return null;
+  }
+
+  int? _indexOfLatestWithoutStatus(String url) {
+    for (var i = _items.length - 1; i >= 0; i--) {
+      if (_items[i].url == url && _items[i].statusCode == null) return i;
     }
     return null;
   }

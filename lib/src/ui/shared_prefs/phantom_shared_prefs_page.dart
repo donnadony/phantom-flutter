@@ -228,112 +228,234 @@ class _PhantomSharedPrefsPageState extends State<PhantomSharedPrefsPage> {
   }
 
   void _showEditDialog(String key, dynamic currentValue, PhantomTheme theme) {
-    final controller = TextEditingController(text: currentValue.toString());
-    showModalBottomSheet(
+    _showValueEditor(theme, existingKey: key, existingValue: currentValue);
+  }
+
+  void _showAddDialog(PhantomTheme theme) => _showValueEditor(theme);
+
+  /// Add/edit sheet with an explicit type, so an int stays an int in
+  /// SharedPreferences instead of being coerced to a string.
+  void _showValueEditor(
+    PhantomTheme theme, {
+    String? existingKey,
+    dynamic existingValue,
+  }) {
+    final isEditing = existingKey != null;
+    final keyController = TextEditingController(text: existingKey ?? '');
+    final valueController = TextEditingController(
+      text: existingValue is List
+          ? (existingValue).join(', ')
+          : existingValue?.toString() ?? '',
+    );
+    var type = isEditing ? _typeLabel(existingValue) : 'String';
+    if (type == 'List') type = 'String';
+
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: theme.background,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Edit Value', style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text(key, style: TextStyle(color: theme.onBackgroundVariant, fontSize: 12, fontFamily: 'monospace')),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: theme.surface, borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: controller,
-                autofocus: true,
-                style: TextStyle(color: theme.onBackground, fontSize: 14, fontFamily: 'monospace'),
-                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.symmetric(vertical: 10)),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Padding(
+          padding: EdgeInsets.fromLTRB(
+              16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isEditing ? 'Edit Value' : 'Add Entry',
+                style: TextStyle(
+                    color: theme.onBackground,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: theme.onBackgroundVariant))),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString(key, controller.text);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                    _loadEntries();
-                  },
-                  child: Text('Save', style: TextStyle(color: theme.info, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              _sheetLabel('Key', theme),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                    color: theme.surface,
+                    borderRadius: BorderRadius.circular(10)),
+                child: TextField(
+                  controller: keyController,
+                  enabled: !isEditing,
+                  autofocus: !isEditing,
+                  style: TextStyle(
+                      color: isEditing
+                          ? theme.onBackgroundVariant
+                          : theme.onBackground,
+                      fontSize: 14,
+                      fontFamily: 'monospace'),
+                  decoration: InputDecoration(
+                    hintText: 'Key',
+                    hintStyle: TextStyle(color: theme.onBackgroundVariant),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                  ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 12),
+              _sheetLabel('Value', theme),
+              if (type == 'Bool')
+                Row(
+                  children: ['true', 'false'].map((option) {
+                    final selected =
+                        valueController.text.toLowerCase() == option;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: GestureDetector(
+                        onTap: () =>
+                            setSheetState(() => valueController.text = option),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: selected ? theme.primary : theme.surface,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            option,
+                            style: TextStyle(
+                              color: selected
+                                  ? theme.onPrimary
+                                  : theme.onBackground,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                )
+              else
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                      color: theme.surface,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: TextField(
+                    controller: valueController,
+                    autofocus: isEditing,
+                    keyboardType: type == 'Int' || type == 'Double'
+                        ? const TextInputType.numberWithOptions(decimal: true)
+                        : TextInputType.text,
+                    style: TextStyle(
+                        color: theme.onBackground,
+                        fontSize: 14,
+                        fontFamily: 'monospace'),
+                    decoration: InputDecoration(
+                      hintText: 'Value',
+                      hintStyle: TextStyle(color: theme.onBackgroundVariant),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 12),
+              _sheetLabel('Type', theme),
+              Wrap(
+                spacing: 8,
+                children: _writableTypes.map((option) {
+                  final selected = type == option;
+                  return GestureDetector(
+                    onTap: () => setSheetState(() {
+                      type = option;
+                      if (option == 'Bool' &&
+                          valueController.text.toLowerCase() != 'true' &&
+                          valueController.text.toLowerCase() != 'false') {
+                        valueController.text = 'true';
+                      }
+                    }),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: selected ? theme.primary : theme.surface,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        option,
+                        style: TextStyle(
+                          color:
+                              selected ? theme.onPrimary : theme.onBackground,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text('Cancel',
+                        style: TextStyle(color: theme.onBackgroundVariant)),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () async {
+                      final key = keyController.text.trim();
+                      if (key.isEmpty) return;
+                      await _writeValue(key, valueController.text, type);
+                      if (ctx.mounted) Navigator.pop(ctx);
+                      await _loadEntries();
+                    },
+                    child: Text(isEditing ? 'Save' : 'Add',
+                        style: TextStyle(
+                            color: theme.info, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _showAddDialog(PhantomTheme theme) {
-    final keyController = TextEditingController();
-    final valueController = TextEditingController();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: theme.background,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Add Entry', style: TextStyle(color: theme.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: theme.surface, borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: keyController, autofocus: true,
-                style: TextStyle(color: theme.onBackground, fontSize: 14),
-                decoration: InputDecoration(hintText: 'Key', hintStyle: TextStyle(color: theme.onBackgroundVariant), border: InputBorder.none, isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 10)),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: theme.surface, borderRadius: BorderRadius.circular(10)),
-              child: TextField(
-                controller: valueController,
-                style: TextStyle(color: theme.onBackground, fontSize: 14),
-                decoration: InputDecoration(hintText: 'Value', hintStyle: TextStyle(color: theme.onBackgroundVariant), border: InputBorder.none, isDense: true, contentPadding: const EdgeInsets.symmetric(vertical: 10)),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: Text('Cancel', style: TextStyle(color: theme.onBackgroundVariant))),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () async {
-                    if (keyController.text.isEmpty) return;
-                    final prefs = await SharedPreferences.getInstance();
-                    await prefs.setString(keyController.text, valueController.text);
-                    if (ctx.mounted) Navigator.pop(ctx);
-                    _loadEntries();
-                  },
-                  child: Text('Add', style: TextStyle(color: theme.info, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            ),
-          ],
-        ),
+  static const _writableTypes = ['String', 'Int', 'Double', 'Bool'];
+
+  Widget _sheetLabel(String text, PhantomTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        text,
+        style: TextStyle(
+            color: theme.onBackgroundVariant,
+            fontSize: 12,
+            fontWeight: FontWeight.bold),
       ),
     );
+  }
+
+  /// Writes [raw] under [key] using the SharedPreferences setter for [type].
+  ///
+  /// The key is removed first so switching an entry's type doesn't leave the
+  /// old typed value behind.
+  Future<void> _writeValue(String key, String raw, String type) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(key);
+    switch (type) {
+      case 'Int':
+        await prefs.setInt(key, int.tryParse(raw.trim()) ?? 0);
+      case 'Double':
+        await prefs.setDouble(key, double.tryParse(raw.trim()) ?? 0);
+      case 'Bool':
+        final normalized = raw.trim().toLowerCase();
+        await prefs.setBool(key, normalized == 'true' || normalized == '1');
+      default:
+        await prefs.setString(key, raw);
+    }
   }
 
   void _showEntryActions(String key, dynamic value, PhantomTheme theme) {

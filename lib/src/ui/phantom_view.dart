@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../phantom_main.dart';
 import '../theme/phantom_theme.dart';
-import 'config/phantom_config_page.dart';
-import 'device_info/phantom_device_info_page.dart';
-import 'localization/phantom_localization_page.dart';
-import 'logs/phantom_logs_page.dart';
-import 'mock/phantom_mock_list_page.dart';
-import 'network/phantom_network_page.dart';
-import 'shared_prefs/phantom_shared_prefs_page.dart';
 
 class PhantomView extends StatelessWidget {
   final VoidCallback? onClose;
@@ -49,74 +43,86 @@ class PhantomViewBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = PhantomThemeProvider.of(context);
 
-    final items = [
-      _MenuItem(title: 'Logs', icon: Icons.description_outlined, destination: const PhantomLogsPage()),
-      _MenuItem(title: 'Network', icon: Icons.language, destination: const PhantomNetworkPage()),
-      _MenuItem(title: 'Mock Services', icon: Icons.sensors, destination: const PhantomMockListPage()),
-      _MenuItem(title: 'Configuration', icon: Icons.settings_outlined, destination: const PhantomConfigPage()),
-      _MenuItem(title: 'Device Info', icon: Icons.phone_iphone, destination: const PhantomDeviceInfoPage()),
-      _MenuItem(title: 'SharedPreferences', icon: Icons.storage_outlined, destination: const PhantomSharedPrefsPage()),
-      _MenuItem(title: 'Localization', icon: Icons.public, destination: const PhantomLocalizationPage()),
-    ];
-
     return SingleChildScrollView(
       child: Column(
         children: [
-          for (final item in items) ...[
-            _phantomRow(context, item: item, theme: theme),
-            Divider(height: 1, color: theme.outlineVariant, indent: 16, endIndent: 16),
+          for (final feature in Phantom.features) ...[
+            _row(
+              context,
+              theme: theme,
+              title: feature.title,
+              icon: feature.icon,
+              onTap: () => _push(context, theme, feature.destination),
+            ),
+            _divider(theme),
+          ],
+          for (final entry in Phantom.customEntries) ...[
+            _row(
+              context,
+              theme: theme,
+              title: entry.title,
+              icon: entry.icon,
+              onTap: entry.action,
+            ),
+            _divider(theme),
           ],
         ],
       ),
     );
   }
 
-  Widget _phantomRow(BuildContext context, {required _MenuItem item, required PhantomTheme theme}) {
+  Widget _divider(PhantomTheme theme) => Divider(
+        height: 1,
+        color: theme.outlineVariant,
+        indent: 16,
+        endIndent: 16,
+      );
+
+  void _push(BuildContext context, PhantomTheme theme, Widget destination) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => PhantomThemeProvider(
+          theme: theme,
+          child: destination,
+        ),
+      ),
+    );
+  }
+
+  Widget _row(
+    BuildContext context, {
+    required PhantomTheme theme,
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: item.destination != null
-          ? () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => PhantomThemeProvider(
-                    theme: theme,
-                    child: item.destination!,
-                  ),
-                ),
-              );
-            }
-          : null,
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Row(
           children: [
             SizedBox(
               width: 24,
-              child: Icon(item.icon, color: theme.primary, size: 20),
+              child: Icon(icon, color: theme.primary, size: 20),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                item.title,
+                title,
                 style: TextStyle(
-                  color: item.destination != null ? theme.onBackground : theme.onBackgroundVariant,
+                  color: theme.onBackground,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: theme.onBackgroundVariant, size: 20),
+            Icon(Icons.chevron_right,
+                color: theme.onBackgroundVariant, size: 20),
           ],
         ),
       ),
     );
   }
-}
-
-class _MenuItem {
-  final String title;
-  final IconData icon;
-  final Widget? destination;
-
-  const _MenuItem({required this.title, required this.icon, this.destination});
 }

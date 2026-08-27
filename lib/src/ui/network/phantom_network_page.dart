@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/phantom_network_item.dart';
 import '../../core/phantom_network_logger.dart';
 import '../../theme/phantom_theme.dart';
+import '../../utils/phantom_exporter.dart';
 import 'phantom_network_detail_page.dart';
 
 class PhantomNetworkPage extends StatefulWidget {
@@ -78,6 +79,12 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
               color: theme.onBackground, fontWeight: FontWeight.bold),
         ),
         actions: [
+          if (_networkLogger.logs.isNotEmpty)
+            IconButton(
+              tooltip: 'Export network log',
+              icon: Icon(Icons.ios_share, color: theme.primary, size: 20),
+              onPressed: _exportNetwork,
+            ),
           TextButton(
             onPressed: _networkLogger.clearAll,
             child: Text('Clear',
@@ -92,6 +99,21 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
           _buildFilters(theme),
           Expanded(child: _buildList(logs, theme)),
         ],
+      ),
+    );
+  }
+
+  Future<void> _exportNetwork() async {
+    final shared = await PhantomExporter.share(
+      contents: PhantomExporter.encodeNetwork(_networkLogger.logs),
+      fileName: 'phantom_network.json',
+      subject: 'Phantom network log',
+    );
+    if (!mounted || shared) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not export network log'),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
