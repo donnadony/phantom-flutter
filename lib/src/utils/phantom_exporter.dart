@@ -73,7 +73,9 @@ class PhantomExporter {
       final dir = await getTemporaryDirectory();
       final file = File('${dir.path}/$fileName');
       await file.writeAsString(contents);
-      await Share.shareXFiles([XFile(file.path)], subject: subject ?? fileName);
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)], subject: subject ?? fileName),
+      );
       return true;
     } catch (_) {
       return false;
@@ -84,16 +86,12 @@ class PhantomExporter {
   /// file, or null if the user cancelled or the file could not be read.
   static Future<String?> pickJsonFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFile(
         type: FileType.custom,
         allowedExtensions: const ['json'],
-        withData: true,
       );
-      final picked = result?.files.single;
       if (picked == null) return null;
-      if (picked.bytes != null) return utf8.decode(picked.bytes!);
-      if (picked.path != null) return await File(picked.path!).readAsString();
-      return null;
+      return utf8.decode(await picked.readAsBytes());
     } catch (_) {
       return null;
     }
