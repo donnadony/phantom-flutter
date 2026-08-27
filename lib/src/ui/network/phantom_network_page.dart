@@ -52,8 +52,8 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
         final url = item.url?.toLowerCase() ?? '';
         final request = item.requestBody.toLowerCase();
         final response = item.responseBody.toLowerCase();
-        final headers =
-            '${item.requestHeaders}\n${item.responseHeaders}'.toLowerCase();
+        final headers = '${item.requestHeaders}\n${item.responseHeaders}'
+            .toLowerCase();
         return url.contains(query) ||
             request.contains(query) ||
             response.contains(query) ||
@@ -76,7 +76,9 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
         title: Text(
           'Network (${_networkLogger.logs.length})',
           style: TextStyle(
-              color: theme.onBackground, fontWeight: FontWeight.bold),
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           if (_networkLogger.logs.isNotEmpty)
@@ -87,9 +89,10 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
             ),
           TextButton(
             onPressed: _networkLogger.clearAll,
-            child: Text('Clear',
-                style: TextStyle(
-                    color: theme.error, fontWeight: FontWeight.w600)),
+            child: Text(
+              'Clear',
+              style: TextStyle(color: theme.error, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -166,8 +169,10 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedFilter = entry.key),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: selected ? theme.primary : theme.surface,
                   borderRadius: BorderRadius.circular(8),
@@ -191,8 +196,10 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
   Widget _buildList(List<PhantomNetworkItem> logs, PhantomTheme theme) {
     if (logs.isEmpty) {
       return Center(
-        child: Text('No requests',
-            style: TextStyle(color: theme.onBackgroundVariant)),
+        child: Text(
+          'No requests',
+          style: TextStyle(color: theme.onBackgroundVariant),
+        ),
       );
     }
     return ListView.separated(
@@ -263,7 +270,9 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
                   Text(
                     _pathText(item),
                     style: TextStyle(
-                        color: theme.onBackgroundVariant, fontSize: 12),
+                      color: theme.onBackgroundVariant,
+                      fontSize: 12,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -273,7 +282,9 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
                       Text(
                         _formatTime(item.createdAt),
                         style: TextStyle(
-                            color: theme.onBackgroundVariant, fontSize: 12),
+                          color: theme.onBackgroundVariant,
+                          fontSize: 12,
+                        ),
                       ),
                       if (item.durationMs != null) ...[
                         const SizedBox(width: 8),
@@ -293,7 +304,9 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
                         Text(
                           _formatBytes(item.responseSizeBytes),
                           style: TextStyle(
-                              color: theme.onBackgroundVariant, fontSize: 12),
+                            color: theme.onBackgroundVariant,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ],
@@ -303,8 +316,11 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Icon(Icons.chevron_right,
-                  color: theme.onBackgroundVariant, size: 16),
+              child: Icon(
+                Icons.chevron_right,
+                color: theme.onBackgroundVariant,
+                size: 16,
+              ),
             ),
           ],
         ),

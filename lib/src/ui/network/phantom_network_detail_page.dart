@@ -49,10 +49,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
 
   PhantomMockRule? get _existingRule => _item.url == null
       ? null
-      : _interceptor.ruleForEndpoint(
-          method: _item.methodType,
-          url: _item.url!,
-        );
+      : _interceptor.ruleForEndpoint(method: _item.methodType, url: _item.url!);
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +63,10 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           '${_item.methodType}${status != null ? ' $status' : ''}',
-          style:
-              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -112,8 +111,10 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
             children: [
               if (_item.statusCode != null)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.statusBackgroundColor(_item.statusCode!),
                     borderRadius: BorderRadius.circular(8),
@@ -142,12 +143,16 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                 Text(
                   _formatBytes(_item.responseSizeBytes),
                   style: TextStyle(
-                      color: theme.onBackgroundVariant, fontSize: 12),
+                    color: theme.onBackgroundVariant,
+                    fontSize: 12,
+                  ),
                 ),
               if (_item.isMock)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.warning,
                     borderRadius: BorderRadius.circular(6),
@@ -193,8 +198,9 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                   tab.name[0].toUpperCase() + tab.name.substring(1),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color:
-                        selected ? theme.background : theme.onBackgroundVariant,
+                    color: selected
+                        ? theme.background
+                        : theme.onBackgroundVariant,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -272,10 +278,16 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
           ),
           child: Row(
             children: [
-              option('Viewer', _showJsonTree,
-                  () => setState(() => _showJsonTree = true)),
-              option('Text', !_showJsonTree,
-                  () => setState(() => _showJsonTree = false)),
+              option(
+                'Viewer',
+                _showJsonTree,
+                () => setState(() => _showJsonTree = true),
+              ),
+              option(
+                'Text',
+                !_showJsonTree,
+                () => setState(() => _showJsonTree = false),
+              ),
             ],
           ),
         ),
@@ -340,26 +352,26 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
           Text(
             'Request Headers',
             style: TextStyle(
-                color: theme.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.bold),
+              color: theme.primary,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
-          PhantomJsonTreeView(
-              jsonString: headersAsJson(_item.requestHeaders)),
+          PhantomJsonTreeView(jsonString: headersAsJson(_item.requestHeaders)),
           const SizedBox(height: 12),
         ],
         if (hasResponse) ...[
           Text(
             'Response Headers',
             style: TextStyle(
-                color: theme.primary,
-                fontSize: 12,
-                fontWeight: FontWeight.bold),
+              color: theme.primary,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
-          PhantomJsonTreeView(
-              jsonString: headersAsJson(_item.responseHeaders)),
+          PhantomJsonTreeView(jsonString: headersAsJson(_item.responseHeaders)),
         ],
       ],
     );
@@ -472,8 +484,7 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
         ),
       ],
       activeResponseId: responseId,
-      ruleDescription:
-          'Mock ${segments.isEmpty ? 'endpoint' : segments.last}',
+      ruleDescription: 'Mock ${segments.isEmpty ? 'endpoint' : segments.last}',
     );
 
     Navigator.of(context).push(

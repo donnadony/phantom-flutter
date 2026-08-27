@@ -34,12 +34,12 @@ class PhantomMockResponse {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'httpMethod': httpMethod,
-        'statusCode': statusCode,
-        'responseBody': responseBody,
-      };
+    'id': id,
+    'name': name,
+    'httpMethod': httpMethod,
+    'statusCode': statusCode,
+    'responseBody': responseBody,
+  };
 
   factory PhantomMockResponse.fromJson(Map<String, dynamic> json) {
     return PhantomMockResponse(
@@ -77,9 +77,9 @@ class PhantomMockRule {
     if (responses.isEmpty) return null;
     if (activeResponseId == null) return responses.first;
     return responses.cast<PhantomMockResponse?>().firstWhere(
-          (r) => r!.id == activeResponseId,
-          orElse: () => responses.first,
-        );
+      (r) => r!.id == activeResponseId,
+      orElse: () => responses.first,
+    );
   }
 
   PhantomMockRule copyWith({
@@ -103,15 +103,15 @@ class PhantomMockRule {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'isEnabled': isEnabled,
-        'urlPattern': urlPattern,
-        'httpMethod': httpMethod,
-        'responses': responses.map((r) => r.toJson()).toList(),
-        'activeResponseId': activeResponseId,
-        'ruleDescription': ruleDescription,
-        'createdAt': createdAt.toIso8601String(),
-      };
+    'id': id,
+    'isEnabled': isEnabled,
+    'urlPattern': urlPattern,
+    'httpMethod': httpMethod,
+    'responses': responses.map((r) => r.toJson()).toList(),
+    'activeResponseId': activeResponseId,
+    'ruleDescription': ruleDescription,
+    'createdAt': createdAt.toIso8601String(),
+  };
 
   factory PhantomMockRule.fromJson(Map<String, dynamic> json) {
     return PhantomMockRule(
@@ -119,9 +119,11 @@ class PhantomMockRule {
       isEnabled: json['isEnabled'] as bool? ?? true,
       urlPattern: json['urlPattern'] as String,
       httpMethod: json['httpMethod'] as String? ?? 'ANY',
-      responses: (json['responses'] as List<dynamic>?)
-              ?.map((r) =>
-                  PhantomMockResponse.fromJson(r as Map<String, dynamic>))
+      responses:
+          (json['responses'] as List<dynamic>?)
+              ?.map(
+                (r) => PhantomMockResponse.fromJson(r as Map<String, dynamic>),
+              )
               .toList() ??
           [],
       activeResponseId: json['activeResponseId'] as String?,

@@ -48,8 +48,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   void initState() {
     super.initState();
     final rule = widget.existingRule;
-    _descriptionController =
-        TextEditingController(text: rule?.ruleDescription ?? '');
+    _descriptionController = TextEditingController(
+      text: rule?.ruleDescription ?? '',
+    );
     _urlPatternController = TextEditingController(text: rule?.urlPattern ?? '');
     _responses = List<PhantomMockResponse>.from(rule?.responses ?? const []);
     _activeResponseId = rule?.activeResponseId ?? _responses.firstOrNull?.id;
@@ -57,8 +58,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
     final active = rule?.activeResponse;
     _httpMethod = active?.httpMethod ?? rule?.httpMethod ?? 'ANY';
     _statusCode = active?.statusCode ?? 200;
-    _responseBodyController =
-        TextEditingController(text: active?.responseBody ?? '{\n  \n}');
+    _responseBodyController = TextEditingController(
+      text: active?.responseBody ?? '{\n  \n}',
+    );
   }
 
   @override
@@ -85,9 +87,10 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
         title: Text(
           _isEditing ? 'Edit Mock Rule' : 'New Mock Rule',
           style: TextStyle(
-              color: theme.onBackground,
-              fontWeight: FontWeight.bold,
-              fontSize: 16),
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
         ),
         actions: [
           TextButton(
@@ -155,11 +158,16 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
                 Text(
                   '$_statusCode - ${phantomStatusCodeLabel(_statusCode)}',
                   style: TextStyle(
-                      color: theme.statusColor(_statusCode), fontSize: 14),
+                    color: theme.statusColor(_statusCode),
+                    fontSize: 14,
+                  ),
                 ),
                 const Spacer(),
-                Icon(Icons.expand_more,
-                    color: theme.onBackgroundVariant, size: 20),
+                Icon(
+                  Icons.expand_more,
+                  color: theme.onBackgroundVariant,
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -172,20 +180,26 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
           children: [
             GestureDetector(
               onTap: _pasteBody,
-              child: Text('Paste',
-                  style: TextStyle(
-                      color: theme.info,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                'Paste',
+                style: TextStyle(
+                  color: theme.info,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             const SizedBox(width: 16),
             GestureDetector(
               onTap: _formatBody,
-              child: Text('Format',
-                  style: TextStyle(
-                      color: theme.info,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold)),
+              child: Text(
+                'Format',
+                style: TextStyle(
+                  color: theme.info,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ],
         ),
@@ -230,8 +244,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
             const SizedBox(width: 8),
             Text(
               'tap to edit · radio selects the active one',
-              style:
-                  TextStyle(color: theme.onBackgroundVariant, fontSize: 11),
+              style: TextStyle(color: theme.onBackgroundVariant, fontSize: 11),
             ),
           ],
         ),
@@ -244,7 +257,11 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
     );
   }
 
-  Widget _responseRow(PhantomMockResponse response, int index, PhantomTheme theme) {
+  Widget _responseRow(
+    PhantomMockResponse response,
+    int index,
+    PhantomTheme theme,
+  ) {
     final isActive = _isActiveResponse(response);
 
     return Dismissible(
@@ -275,8 +292,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
           child: Row(
             children: [
               GestureDetector(
-                onTap: () =>
-                    setState(() => _activeResponseId = response.id),
+                onTap: () => setState(() => _activeResponseId = response.id),
                 child: Icon(
                   isActive
                       ? Icons.radio_button_checked
@@ -307,7 +323,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 1),
+                            horizontal: 6,
+                            vertical: 1,
+                          ),
                           decoration: BoxDecoration(
                             color: theme
                                 .methodColor(response.httpMethod)
@@ -336,8 +354,11 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right,
-                  color: theme.onBackgroundVariant, size: 16),
+              Icon(
+                Icons.chevron_right,
+                color: theme.onBackgroundVariant,
+                size: 16,
+              ),
             ],
           ),
         ),
@@ -363,9 +384,10 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
             Text(
               'Add Response',
               style: TextStyle(
-                  color: theme.info,
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold),
+                color: theme.info,
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -387,7 +409,10 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   }
 
   Widget _textField(
-      TextEditingController controller, String hint, PhantomTheme theme) {
+    TextEditingController controller,
+    String hint,
+    PhantomTheme theme,
+  ) {
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -454,7 +479,10 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
           'Delete Rule',
           textAlign: TextAlign.center,
           style: TextStyle(
-              color: theme.error, fontSize: 14, fontWeight: FontWeight.bold),
+            color: theme.error,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -501,7 +529,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   }
 
   Future<void> _editResponse(
-      PhantomMockResponse response, PhantomTheme theme) async {
+    PhantomMockResponse response,
+    PhantomTheme theme,
+  ) async {
     final updated = await Navigator.of(context).push<PhantomMockResponse>(
       MaterialPageRoute(
         builder: (_) => PhantomThemeProvider(
@@ -563,9 +593,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
 
     final activeId = _activeResponseId ?? _responses.firstOrNull?.id;
     final active = _responses.cast<PhantomMockResponse?>().firstWhere(
-          (r) => r!.id == activeId,
-          orElse: () => _responses.firstOrNull,
-        );
+      (r) => r!.id == activeId,
+      orElse: () => _responses.firstOrNull,
+    );
 
     final rule = PhantomMockRule(
       id: widget.existingRule?.id ?? _newId(),
@@ -592,8 +622,9 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
   void _formatBody() {
     try {
       final parsed = jsonDecode(_responseBodyController.text);
-      _responseBodyController.text =
-          const JsonEncoder.withIndent('  ').convert(parsed);
+      _responseBodyController.text = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(parsed);
     } catch (_) {}
   }
 

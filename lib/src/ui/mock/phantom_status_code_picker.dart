@@ -122,9 +122,10 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
             child: Text(
               'Status Code',
               style: TextStyle(
-                  color: theme.onBackground,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+                color: theme.onBackground,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Padding(
@@ -137,21 +138,21 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search,
-                      color: theme.onBackgroundVariant, size: 18),
+                  Icon(
+                    Icons.search,
+                    color: theme.onBackgroundVariant,
+                    size: 18,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: TextField(
-                      style:
-                          TextStyle(color: theme.onBackground, fontSize: 14),
+                      style: TextStyle(color: theme.onBackground, fontSize: 14),
                       decoration: InputDecoration(
                         hintText: 'Search by code or name',
-                        hintStyle:
-                            TextStyle(color: theme.onBackgroundVariant),
+                        hintStyle: TextStyle(color: theme.onBackgroundVariant),
                         border: InputBorder.none,
                         isDense: true,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 8),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                       onChanged: (v) => setState(() => _search = v),
                     ),
@@ -166,8 +167,9 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
               children: [
                 if (_search.isEmpty) ...[
                   _sectionHeader('Common', theme),
-                  ..._commonStatusCodes.entries
-                      .map((e) => _codeRow(e.key, e.value, theme)),
+                  ..._commonStatusCodes.entries.map(
+                    (e) => _codeRow(e.key, e.value, theme),
+                  ),
                   const SizedBox(height: 8),
                 ],
                 ...phantomStatusCodeGroups.entries.expand((group) {
@@ -194,9 +196,10 @@ class _StatusCodePickerState extends State<_StatusCodePicker> {
       child: Text(
         title,
         style: TextStyle(
-            color: theme.onBackgroundVariant,
-            fontSize: 11,
-            fontWeight: FontWeight.bold),
+          color: theme.onBackgroundVariant,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

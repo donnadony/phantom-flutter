@@ -13,8 +13,11 @@ void main() {
     setUp(() => PhantomLogger.instance.clearAll());
 
     test('logs items with correct level and tag', () {
-      PhantomLogger.instance
-          .log(PhantomLogLevel.info, 'test message', tag: 'Auth');
+      PhantomLogger.instance.log(
+        PhantomLogLevel.info,
+        'test message',
+        tag: 'Auth',
+      );
 
       expect(PhantomLogger.instance.logs.length, 1);
       expect(PhantomLogger.instance.logs.first.level, PhantomLogLevel.info);
@@ -89,13 +92,19 @@ void main() {
     });
 
     test('concurrent requests to the same URL each get their own entry', () {
-      PhantomNetworkLogger.instance
-          .logRequest(method: 'GET', url: 'https://api.test/feed');
-      PhantomNetworkLogger.instance
-          .logRequest(method: 'GET', url: 'https://api.test/feed');
+      PhantomNetworkLogger.instance.logRequest(
+        method: 'GET',
+        url: 'https://api.test/feed',
+      );
+      PhantomNetworkLogger.instance.logRequest(
+        method: 'GET',
+        url: 'https://api.test/feed',
+      );
 
-      PhantomNetworkLogger.instance
-          .logResponse(url: 'https://api.test/feed', statusCode: 200);
+      PhantomNetworkLogger.instance.logResponse(
+        url: 'https://api.test/feed',
+        statusCode: 200,
+      );
 
       final logs = PhantomNetworkLogger.instance.logs;
       expect(logs.length, 2);
@@ -104,8 +113,10 @@ void main() {
     });
 
     test('logError completes a pending request', () {
-      PhantomNetworkLogger.instance
-          .logRequest(method: 'POST', url: 'https://api.test/login');
+      PhantomNetworkLogger.instance.logRequest(
+        method: 'POST',
+        url: 'https://api.test/login',
+      );
       PhantomNetworkLogger.instance.logError(
         url: 'https://api.test/login',
         errorMessage: 'Connection timeout',
@@ -117,8 +128,10 @@ void main() {
     });
 
     test('updateResponseMetadata does not complete the request', () {
-      PhantomNetworkLogger.instance
-          .logRequest(method: 'GET', url: 'https://api.test/slow');
+      PhantomNetworkLogger.instance.logRequest(
+        method: 'GET',
+        url: 'https://api.test/slow',
+      );
       PhantomNetworkLogger.instance.updateResponseMetadata(
         url: 'https://api.test/slow',
         statusCode: 200,
@@ -220,12 +233,16 @@ void main() {
 
       expect(
         interceptor.mockResponse(
-            method: 'GET', url: 'https://api.test/v1/users'),
+          method: 'GET',
+          url: 'https://api.test/v1/users',
+        ),
         isNull,
       );
       expect(
         interceptor.mockResponse(
-            method: 'POST', url: 'https://api.test/v1/users'),
+          method: 'POST',
+          url: 'https://api.test/v1/users',
+        ),
         isNotNull,
       );
     });
@@ -235,7 +252,9 @@ void main() {
 
       expect(
         interceptor.mockResponse(
-            method: 'GET', url: 'https://api.test/v1/users'),
+          method: 'GET',
+          url: 'https://api.test/v1/users',
+        ),
         isNull,
       );
     });
@@ -243,8 +262,7 @@ void main() {
     test('a hit is recorded in the network log as a mock', () async {
       await interceptor.addRule(buildRule());
 
-      interceptor.mockResponse(
-          method: 'GET', url: 'https://api.test/v1/users');
+      interceptor.mockResponse(method: 'GET', url: 'https://api.test/v1/users');
 
       final logs = PhantomNetworkLogger.instance.logs;
       expect(logs.length, 1);
@@ -254,20 +272,26 @@ void main() {
 
     test('setActiveResponse switches which response is served', () async {
       final rule = buildRule();
-      rule.responses.add(PhantomMockResponse(
-        id: 'rule_1_r2',
-        name: 'Server error',
-        httpMethod: 'ANY',
-        statusCode: 500,
-        responseBody: '{"error":"boom"}',
-      ));
+      rule.responses.add(
+        PhantomMockResponse(
+          id: 'rule_1_r2',
+          name: 'Server error',
+          httpMethod: 'ANY',
+          statusCode: 500,
+          responseBody: '{"error":"boom"}',
+        ),
+      );
       await interceptor.addRule(rule);
 
       await interceptor.setActiveResponse(
-          ruleId: 'rule_1', responseId: 'rule_1_r2');
+        ruleId: 'rule_1',
+        responseId: 'rule_1_r2',
+      );
 
       final hit = interceptor.mockResponse(
-          method: 'GET', url: 'https://api.test/v1/users');
+        method: 'GET',
+        url: 'https://api.test/v1/users',
+      );
       expect(hit!.statusCode, 500);
     });
 

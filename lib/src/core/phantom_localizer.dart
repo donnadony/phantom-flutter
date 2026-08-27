@@ -41,12 +41,14 @@ class PhantomLocalizer extends ChangeNotifier {
   }) {
     final id = '${group}_$key';
     if (_entries.any((e) => e.id == id)) return;
-    _entries.add(PhantomLocalizationEntry(
-      key: key,
-      english: english,
-      spanish: spanish,
-      group: group,
-    ));
+    _entries.add(
+      PhantomLocalizationEntry(
+        key: key,
+        english: english,
+        spanish: spanish,
+        group: group,
+      ),
+    );
     notifyListeners();
   }
 
@@ -54,14 +56,17 @@ class PhantomLocalizer extends ChangeNotifier {
     _currentLanguage = language;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_languageKey, language == PhantomLanguage.spanish ? 'spanish' : 'english');
+    await prefs.setString(
+      _languageKey,
+      language == PhantomLanguage.spanish ? 'spanish' : 'english',
+    );
   }
 
   String localized(String key, {String? group}) {
     final entry = _entries.cast<PhantomLocalizationEntry?>().firstWhere(
-          (e) => e!.key == key && (group == null || e.group == group),
-          orElse: () => null,
-        );
+      (e) => e!.key == key && (group == null || e.group == group),
+      orElse: () => null,
+    );
     return entry?.value(_currentLanguage) ?? key;
   }
 

@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - run: flutter pub get
+
+      # Runs before the tests: an unformatted diff is what turned a 400-line
+      # feature into an unmergeable 1451-line one once already.
+      #
+      # Deliberately on the same channel the contributors use rather than the
+      # floor this package declares: `dart format` output changes between SDK
+      # versions, so pinning here would fail on formatting rather than on
+      # anything real.
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test example/lib
+
+      - run: flutter analyze
+
+      - run: flutter test

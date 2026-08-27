@@ -63,11 +63,7 @@ class Phantom {
 
   // MARK: - App Logging
 
-  static void log(
-    PhantomLogLevel level,
-    String message, {
-    String? tag,
-  }) {
+  static void log(PhantomLogLevel level, String message, {String? tag}) {
     PhantomLogger.instance.log(level, message, tag: tag);
   }
 
@@ -99,10 +95,14 @@ class Phantom {
     if (headers == null) return 'No headers';
     if (headers is String) return headers.isEmpty ? 'No headers' : headers;
     if (headers is Map) {
-      return headers.entries.map((e) {
-        final value = e.value is List ? (e.value as List).join(', ') : e.value;
-        return '${e.key}: $value';
-      }).join('\n');
+      return headers.entries
+          .map((e) {
+            final value = e.value is List
+                ? (e.value as List).join(', ')
+                : e.value;
+            return '${e.key}: $value';
+          })
+          .join('\n');
     }
     return headers.toString();
   }
@@ -193,8 +193,10 @@ class Phantom {
     Map<String, dynamic> data, {
     String sourcePrefix = '[External]',
   }) {
-    PhantomNetworkLogger.instance
-        .logExternalEntry(data, sourcePrefix: sourcePrefix);
+    PhantomNetworkLogger.instance.logExternalEntry(
+      data,
+      sourcePrefix: sourcePrefix,
+    );
   }
 
   // MARK: - Mock Interceptor
@@ -206,8 +208,10 @@ class Phantom {
     required String method,
     required String url,
   }) {
-    return PhantomMockInterceptor.instance
-        .mockResponse(method: method, url: url);
+    return PhantomMockInterceptor.instance.mockResponse(
+      method: method,
+      url: url,
+    );
   }
 
   /// Reloads persisted mock rules from disk.
@@ -235,8 +239,10 @@ class Phantom {
     String name = 'Phantom Mocks',
     String description = '',
   }) {
-    return PhantomMockInterceptor.instance
-        .exportCollection(name: name, description: description);
+    return PhantomMockInterceptor.instance.exportCollection(
+      name: name,
+      description: description,
+    );
   }
 
   static List<PhantomMockRule> get mockRules =>
@@ -307,10 +313,8 @@ class Phantom {
   static void show(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => PhantomThemeProvider(
-          theme: theme,
-          child: const PhantomView(),
-        ),
+        builder: (_) =>
+            PhantomThemeProvider(theme: theme, child: const PhantomView()),
       ),
     );
   }

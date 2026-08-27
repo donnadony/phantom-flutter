@@ -118,8 +118,10 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           'Deep Link Tester',
-          style:
-              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           if (_history.isNotEmpty)
@@ -128,9 +130,10 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
               child: Text(
                 'Clear',
                 style: TextStyle(
-                    color: theme.error,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14),
+                  color: theme.error,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
             ),
         ],
@@ -140,9 +143,7 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
           _buildInput(theme),
           if (_errorMessage != null) _buildError(theme),
           Expanded(
-            child: _history.isEmpty
-                ? _buildEmpty(theme)
-                : _buildHistory(theme),
+            child: _history.isEmpty ? _buildEmpty(theme) : _buildHistory(theme),
           ),
         ],
       ),
@@ -170,8 +171,7 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
                     keyboardType: TextInputType.url,
                     autocorrect: false,
                     textCapitalization: TextCapitalization.none,
-                    style:
-                        TextStyle(color: theme.onBackground, fontSize: 14),
+                    style: TextStyle(color: theme.onBackground, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'myapp://path or https://...',
                       hintStyle: TextStyle(color: theme.onBackgroundVariant),
@@ -186,8 +186,11 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
                 if (_controller.text.isNotEmpty)
                   GestureDetector(
                     onTap: () => setState(_controller.clear),
-                    child: Icon(Icons.cancel,
-                        color: theme.onBackgroundVariant, size: 18),
+                    child: Icon(
+                      Icons.cancel,
+                      color: theme.onBackgroundVariant,
+                      size: 18,
+                    ),
                   ),
               ],
             ),
@@ -235,9 +238,10 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
             child: Text(
               _errorMessage!,
               style: TextStyle(
-                  color: theme.error,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600),
+                color: theme.error,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -252,9 +256,10 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
         children: [
           Icon(Icons.link_off, color: theme.onBackgroundVariant, size: 40),
           const SizedBox(height: 12),
-          Text('No history yet',
-              style:
-                  TextStyle(color: theme.onBackgroundVariant, fontSize: 14)),
+          Text(
+            'No history yet',
+            style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14),
+          ),
           const SizedBox(height: 4),
           Text(
             'Enter a URL scheme or universal link above',
@@ -320,8 +325,7 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
                 children: [
                   Text(
                     item.url,
-                    style:
-                        TextStyle(color: theme.onBackground, fontSize: 13),
+                    style: TextStyle(color: theme.onBackground, fontSize: 13),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -329,7 +333,9 @@ class _PhantomDeepLinkPageState extends State<PhantomDeepLinkPage> {
                   Text(
                     item.timeText,
                     style: TextStyle(
-                        color: theme.onBackgroundVariant, fontSize: 11),
+                      color: theme.onBackgroundVariant,
+                      fontSize: 11,
+                    ),
                   ),
                 ],
               ),
@@ -360,16 +366,15 @@ class _HistoryItem {
   }
 
   Map<String, dynamic> toJson() => {
-        'url': url,
-        'timestamp': timestamp.millisecondsSinceEpoch,
-        'success': success,
-      };
+    'url': url,
+    'timestamp': timestamp.millisecondsSinceEpoch,
+    'success': success,
+  };
 
   factory _HistoryItem.fromJson(Map<String, dynamic> json) {
     return _HistoryItem(
       url: json['url'] as String,
-      timestamp:
-          DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
+      timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] as int),
       success: json['success'] as bool? ?? false,
     );
   }

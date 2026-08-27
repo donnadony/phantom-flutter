@@ -44,8 +44,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
         foregroundColor: theme.onBackground,
         title: Text(
           'Mock Services',
-          style:
-              TextStyle(color: theme.onBackground, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: theme.onBackground,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           PopupMenuButton<_MockMenuAction>(
@@ -57,11 +59,16 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                 value: _MockMenuAction.import,
                 child: Row(
                   children: [
-                    Icon(Icons.file_download_outlined,
-                        color: theme.onBackground, size: 18),
+                    Icon(
+                      Icons.file_download_outlined,
+                      color: theme.onBackground,
+                      size: 18,
+                    ),
                     const SizedBox(width: 10),
-                    Text('Import from file',
-                        style: TextStyle(color: theme.onBackground)),
+                    Text(
+                      'Import from file',
+                      style: TextStyle(color: theme.onBackground),
+                    ),
                   ],
                 ),
               ),
@@ -70,11 +77,16 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                   value: _MockMenuAction.export,
                   child: Row(
                     children: [
-                      Icon(Icons.file_upload_outlined,
-                          color: theme.onBackground, size: 18),
+                      Icon(
+                        Icons.file_upload_outlined,
+                        color: theme.onBackground,
+                        size: 18,
+                      ),
                       const SizedBox(width: 10),
-                      Text('Export all mocks',
-                          style: TextStyle(color: theme.onBackground)),
+                      Text(
+                        'Export all mocks',
+                        style: TextStyle(color: theme.onBackground),
+                      ),
                     ],
                   ),
                 ),
@@ -85,8 +97,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                     children: [
                       Icon(Icons.delete_outline, color: theme.error, size: 18),
                       const SizedBox(width: 10),
-                      Text('Delete all rules',
-                          style: TextStyle(color: theme.error)),
+                      Text(
+                        'Delete all rules',
+                        style: TextStyle(color: theme.error),
+                      ),
                     ],
                   ),
                 ),
@@ -112,9 +126,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
           Text(
             'No mock rules',
             style: TextStyle(
-                color: theme.onBackground,
-                fontSize: 18,
-                fontWeight: FontWeight.bold),
+              color: theme.onBackground,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -122,8 +137,7 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
             child: Text(
               'Tap + to create a rule, import from a JSON file, or use "Mock this" from the Network view.',
               textAlign: TextAlign.center,
-              style:
-                  TextStyle(color: theme.onBackgroundVariant, fontSize: 14),
+              style: TextStyle(color: theme.onBackgroundVariant, fontSize: 14),
             ),
           ),
         ],
@@ -185,14 +199,17 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                     Row(
                       children: [
                         _methodBadge(
-                            activeResponse?.httpMethod ?? rule.httpMethod,
-                            theme),
+                          activeResponse?.httpMethod ?? rule.httpMethod,
+                          theme,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             rule.urlPattern,
                             style: TextStyle(
-                                color: theme.onBackgroundVariant, fontSize: 12),
+                              color: theme.onBackgroundVariant,
+                              fontSize: 12,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -203,22 +220,29 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.play_arrow,
-                              color: theme.primary, size: 12),
+                          Icon(
+                            Icons.play_arrow,
+                            color: theme.primary,
+                            size: 12,
+                          ),
                           const SizedBox(width: 2),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 1),
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
                               color: theme.statusBackgroundColor(
-                                  activeResponse.statusCode),
+                                activeResponse.statusCode,
+                              ),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               '${activeResponse.statusCode}',
                               style: TextStyle(
-                                color:
-                                    theme.statusColor(activeResponse.statusCode),
+                                color: theme.statusColor(
+                                  activeResponse.statusCode,
+                                ),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -229,8 +253,9 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                             child: Text(
                               activeResponse.name,
                               style: TextStyle(
-                                  color: theme.onBackgroundVariant,
-                                  fontSize: 11),
+                                color: theme.onBackgroundVariant,
+                                fontSize: 11,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -240,8 +265,9 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                             Text(
                               '(${rule.responses.length} responses)',
                               style: TextStyle(
-                                  color: theme.onBackgroundVariant,
-                                  fontSize: 11),
+                                color: theme.onBackgroundVariant,
+                                fontSize: 11,
+                              ),
                             ),
                           ],
                         ],
@@ -298,9 +324,11 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
     final imported = await _interceptor.importCollection(contents);
     if (!mounted) return;
 
-    _toast(imported == null
-        ? 'Invalid mock file'
-        : '$imported rule${imported == 1 ? '' : 's'} loaded');
+    _toast(
+      imported == null
+          ? 'Invalid mock file'
+          : '$imported rule${imported == 1 ? '' : 's'} loaded',
+    );
   }
 
   Future<void> _exportMocks() async {
@@ -318,8 +346,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: theme.surface,
-        title: Text('Delete all rules?',
-            style: TextStyle(color: theme.onBackground, fontSize: 16)),
+        title: Text(
+          'Delete all rules?',
+          style: TextStyle(color: theme.onBackground, fontSize: 16),
+        ),
         content: Text(
           'This removes every mock rule stored on this device.',
           style: TextStyle(color: theme.onBackgroundVariant, fontSize: 13),
@@ -327,17 +357,20 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel',
-                style: TextStyle(color: theme.onBackgroundVariant)),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: theme.onBackgroundVariant),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               _interceptor.clearAll();
             },
-            child: Text('Delete',
-                style: TextStyle(
-                    color: theme.error, fontWeight: FontWeight.bold)),
+            child: Text(
+              'Delete',
+              style: TextStyle(color: theme.error, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -355,7 +388,10 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
   }
 
   void _openEditor(
-      BuildContext context, PhantomTheme theme, PhantomMockRule? rule) {
+    BuildContext context,
+    PhantomTheme theme,
+    PhantomMockRule? rule,
+  ) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => PhantomThemeProvider(
@@ -369,8 +405,9 @@ class _PhantomMockListPageState extends State<PhantomMockListPage> {
                 _interceptor.addRule(savedRule);
               }
             },
-            onDelete:
-                rule != null ? () => _interceptor.deleteRule(rule.id) : null,
+            onDelete: rule != null
+                ? () => _interceptor.deleteRule(rule.id)
+                : null,
           ),
         ),
       ),

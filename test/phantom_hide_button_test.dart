@@ -15,9 +15,9 @@ void main() {
   tearDown(() => shakes.close());
 
   Widget harness() => PhantomOverlay(
-        shakeDetector: PhantomShakeDetector(source: () => shakes.stream),
-        child: const MaterialApp(home: Scaffold(body: Text('the app'))),
-      );
+    shakeDetector: PhantomShakeDetector(source: () => shakes.stream),
+    child: const MaterialApp(home: Scaffold(body: Text('the app'))),
+  );
 
   Finder floatingButton() => find.byIcon(Icons.bug_report_rounded);
 
@@ -109,9 +109,7 @@ void main() {
   ) async {
     // Phantom.show(context) pushes the panel without an overlay behind it, so
     // a "hide the button" row there would do nothing.
-    await tester.pumpWidget(
-      const MaterialApp(home: PhantomView()),
-    );
+    await tester.pumpWidget(const MaterialApp(home: PhantomView()));
     await tester.pumpAndSettle();
 
     expect(find.text(_hide), findsNothing);
