@@ -1,5 +1,8 @@
 export 'src/phantom_main.dart';
 export 'src/phantom_overlay.dart';
+export 'src/ui/phantom_sheet.dart' show PhantomPresentation, PhantomSheet;
+export 'src/ui/phantom_view.dart' show PhantomView, PhantomViewBody;
+export 'src/adapters/dio_interceptor.dart' show PhantomDioInterceptorBase;
 export 'src/core/models/phantom_feature.dart';
 export 'src/core/models/phantom_log_item.dart';
 export 'src/core/models/phantom_network_item.dart';

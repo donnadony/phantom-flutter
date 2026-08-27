@@ -1,3 +1,12 @@
+## 0.0.3
+
+### Added
+
+* **Sheet presentation** — `PhantomOverlay(presentation: PhantomPresentation.sheet)` makes the panel rise from the bottom at half the screen, draggable by its handle to full height and dismissed by dragging it down or tapping outside. It leaves the app visible behind it, so what the screen shows can be compared against what the request returned. `fullScreen` remains the default, so existing callers are unaffected.
+* `initialSheetSize` to control the height the sheet opens at, which doubles as its lower snap point.
+* `buttonIcon` to override the floating button's glyph.
+* `PhantomPresentation`, `PhantomSheet`, `PhantomView`, `PhantomViewBody` and `PhantomDioInterceptorBase` are now exported.
+
 ## 0.0.2
 
 Feature parity pass with [phantom-ios](https://github.com/donnadony/phantom-ios).

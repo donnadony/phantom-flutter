@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'phantom_main.dart';
 import 'theme/phantom_theme.dart';
+import 'ui/phantom_sheet.dart';
 import 'ui/phantom_view.dart';
 
 class PhantomOverlay extends StatefulWidget {
@@ -9,11 +10,27 @@ class PhantomOverlay extends StatefulWidget {
   final bool showFloatingButton;
   final PhantomTheme? theme;
 
+  /// Whether the panel covers the app or rises as a draggable sheet.
+  /// Defaults to [PhantomPresentation.fullScreen] so existing callers see no
+  /// change.
+  final PhantomPresentation presentation;
+
+  /// Fraction of the screen the sheet opens at. Ignored when [presentation] is
+  /// [PhantomPresentation.fullScreen].
+  final double initialSheetSize;
+
+  /// The glyph on the floating button. The bug badge by default; apps that
+  /// already spend that shape on something else can pass their own.
+  final IconData buttonIcon;
+
   const PhantomOverlay({
     super.key,
     required this.child,
     this.showFloatingButton = true,
     this.theme,
+    this.presentation = PhantomPresentation.fullScreen,
+    this.initialSheetSize = 0.5,
+    this.buttonIcon = Icons.bug_report_rounded,
   });
 
   @override
@@ -65,15 +82,25 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
                   }
                 },
                 onTap: _openPhantom,
-                child: _FloatingButton(theme: widget.theme ?? Phantom.theme),
+                child: _FloatingButton(
+                  theme: widget.theme ?? Phantom.theme,
+                  icon: widget.buttonIcon,
+                ),
               ),
             ),
           if (_phantomOpen)
             Positioned.fill(
-              child: _PhantomApp(
-                theme: widget.theme ?? Phantom.theme,
-                onClose: () => setState(() => _phantomOpen = false),
-              ),
+              child: switch (widget.presentation) {
+                PhantomPresentation.fullScreen => _PhantomApp(
+                  theme: widget.theme ?? Phantom.theme,
+                  onClose: _closePhantom,
+                ),
+                PhantomPresentation.sheet => PhantomSheet(
+                  theme: widget.theme ?? Phantom.theme,
+                  initialSize: widget.initialSheetSize,
+                  onClose: _closePhantom,
+                ),
+              },
             ),
         ],
       ),
@@ -93,6 +120,10 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
 
   void _openPhantom() {
     setState(() => _phantomOpen = true);
+  }
+
+  void _closePhantom() {
+    if (mounted) setState(() => _phantomOpen = false);
   }
 }
 
@@ -117,8 +148,9 @@ class _PhantomApp extends StatelessWidget {
 
 class _FloatingButton extends StatelessWidget {
   final PhantomTheme theme;
+  final IconData icon;
 
-  const _FloatingButton({required this.theme});
+  const _FloatingButton({required this.theme, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -136,11 +168,7 @@ class _FloatingButton extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(
-        Icons.bug_report_rounded,
-        color: theme.onPrimary,
-        size: 22,
-      ),
+      child: Icon(icon, color: theme.onPrimary, size: 22),
     );
   }
 }
