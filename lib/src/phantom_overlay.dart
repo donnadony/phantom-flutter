@@ -13,6 +13,9 @@ class PhantomOverlay extends StatefulWidget {
   /// Whether the panel covers the app or rises as a draggable sheet.
   /// Defaults to [PhantomPresentation.fullScreen] so existing callers see no
   /// change.
+  ///
+  /// Governs the floating button only. `Phantom.show(context)` always pushes
+  /// the panel full screen on the host navigator.
   final PhantomPresentation presentation;
 
   /// Fraction of the screen the sheet opens at. Ignored when [presentation] is
@@ -31,7 +34,11 @@ class PhantomOverlay extends StatefulWidget {
     this.presentation = PhantomPresentation.fullScreen,
     this.initialSheetSize = 0.5,
     this.buttonIcon = Icons.bug_report_rounded,
-  });
+  }) : assert(
+         initialSheetSize > 0 && initialSheetSize <= 1,
+         'initialSheetSize is a fraction of the screen. At 0 the panel has no '
+         'height but its scrim still swallows every tap; above 1 it overflows.',
+       );
 
   @override
   State<PhantomOverlay> createState() => _PhantomOverlayState();

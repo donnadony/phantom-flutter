@@ -1,3 +1,18 @@
+## 0.0.4
+
+### Fixed
+
+* **An open keyboard made the sheet unusable.** The panel is bottom-anchored, but its nested `MaterialApp` builds its `MediaQuery` from the `FlutterView`, so the keyboard inset was applied inside a box that never moved: on a 400x800 screen with a 336pt keyboard the panel's contents collapsed to zero height. Every text field the panel owns — Configuration entries, the SharedPreferences editor, mock response bodies — was reachable only by tapping a field that then erased the page it lived on. The sheet now sits on top of the keyboard and caps its height to what is left.
+* **The status bar padded the panel from the inside.** The same inherited `MediaQuery` made the panel's `AppBar` render 47pt taller than it should, on every page it pushes — a third of the visible chrome on a half-height sheet.
+* **Drag-to-close stopped working below the default `minSize`.** The drag clamped to a hardcoded floor of `0.1` while the close threshold followed `minSize`, so any `minSize` under `0.1` removed the dismiss gesture entirely. The floor now derives from `minSize`.
+* `PhantomSheet` now asserts `initialSize >= minSize`. Passing `PhantomOverlay(initialSheetSize: 0.2)` previously opened the sheet already below its close threshold, where a two-pixel drag dismissed it.
+* `PhantomOverlay` now asserts `initialSheetSize` is a fraction between 0 and 1. At 0 the panel had no height but its scrim still swallowed every tap.
+* `PhantomSheet` resets its drag state before calling `onClose`, so callers that hide the sheet rather than unmounting it get it back in a usable state.
+
+### Documentation
+
+* `PhantomOverlay.presentation` documents that it governs the floating button only: `Phantom.show(context)` always pushes the panel full screen on the host navigator.
+
 ## 0.0.3
 
 ### Added

@@ -113,4 +113,79 @@ void main() {
 
     expect(overlay.presentation, PhantomPresentation.fullScreen);
   });
+
+  group('window insets', () {
+    testWidgets('an open keyboard lifts the sheet instead of crushing it', (
+      tester,
+    ) async {
+      // The panel is bottom-anchored inside a nested MaterialApp, which builds
+      // its MediaQuery from the FlutterView. Left alone, the keyboard inset
+      // applied inside a box that never moved collapsed the panel to nothing.
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.viewInsets = const FakeViewPadding(bottom: 336);
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(_harness());
+      await tester.pumpAndSettle();
+
+      final panel = tester.getRect(find.byType(ClipRRect).first);
+      expect(panel.bottom, closeTo(800 - 336, 0.5),
+          reason: 'the sheet should sit on top of the keyboard');
+
+      final body = tester.getRect(find.byType(PhantomViewBody));
+      expect(body.height, greaterThan(0),
+          reason: 'the panel contents must survive an open keyboard');
+    });
+
+    testWidgets('the status bar does not pad the panel from the inside', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(400, 800);
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.padding = const FakeViewPadding(top: 47);
+      addTearDown(tester.view.reset);
+
+      await tester.pumpWidget(_harness());
+      await tester.pumpAndSettle();
+
+      // The sheet's top edge is nowhere near the status bar, so the AppBar
+      // should be its plain height rather than 47pt taller.
+      expect(tester.getSize(find.byType(AppBar)).height, closeTo(56, 0.5));
+    });
+  });
+
+  group('size bounds', () {
+    testWidgets('drag-to-close still works below the default minSize', (
+      tester,
+    ) async {
+      // The clamp floor used to be a hardcoded 0.1, so any minSize under it
+      // put the close threshold somewhere the drag could never reach.
+      var closed = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PhantomSheet(
+            theme: _theme,
+            minSize: 0.05,
+            onClose: () => closed++,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.drag(find.byType(PhantomSheet), const Offset(0, 5000));
+      await tester.pumpAndSettle();
+
+      expect(closed, 1);
+    });
+
+    testWidgets('an initialSize below minSize is rejected', (tester) async {
+      // Otherwise the sheet opens already past its close threshold and a
+      // two-pixel drag dismisses it.
+      expect(
+        () => PhantomSheet(theme: _theme, initialSize: 0.2, onClose: () {}),
+        throwsAssertionError,
+      );
+    });
+  });
 }
