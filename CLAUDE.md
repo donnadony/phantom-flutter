@@ -18,7 +18,7 @@ dependencies:
   phantom_flutter:
     git:
       url: https://github.com/donnadony/phantom-flutter.git
-      ref: v0.0.4
+      ref: v0.0.5
 ```
 
 Then run `flutter pub get`.
@@ -221,6 +221,7 @@ Patterns are matched against the URL **path**, not the full URL, so `/v1/users` 
 - `url_launcher` (deep link tester)
 - `share_plus` (exporting logs / network / mocks)
 - `file_picker` (importing mock collections)
+- `sensors_plus` (shake to reopen once the floating button is hidden)
 
 ### Known platform gaps vs phantom-ios
 
