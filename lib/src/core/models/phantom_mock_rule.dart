@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+/// HTTP methods a mock rule or response can be bound to. `ANY` matches all.
+const phantomHttpMethods = ['ANY', 'GET', 'POST', 'PUT', 'DELETE'];
+
 class PhantomMockResponse {
   final String id;
   String name;
@@ -14,6 +17,21 @@ class PhantomMockResponse {
     this.statusCode = 200,
     this.responseBody = '{\n  \n}',
   });
+
+  PhantomMockResponse copyWith({
+    String? name,
+    String? httpMethod,
+    int? statusCode,
+    String? responseBody,
+  }) {
+    return PhantomMockResponse(
+      id: id,
+      name: name ?? this.name,
+      httpMethod: httpMethod ?? this.httpMethod,
+      statusCode: statusCode ?? this.statusCode,
+      responseBody: responseBody ?? this.responseBody,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -64,6 +82,26 @@ class PhantomMockRule {
         );
   }
 
+  PhantomMockRule copyWith({
+    bool? isEnabled,
+    String? urlPattern,
+    String? httpMethod,
+    List<PhantomMockResponse>? responses,
+    String? activeResponseId,
+    String? ruleDescription,
+  }) {
+    return PhantomMockRule(
+      id: id,
+      isEnabled: isEnabled ?? this.isEnabled,
+      urlPattern: urlPattern ?? this.urlPattern,
+      httpMethod: httpMethod ?? this.httpMethod,
+      responses: responses ?? this.responses,
+      activeResponseId: activeResponseId ?? this.activeResponseId,
+      ruleDescription: ruleDescription ?? this.ruleDescription,
+      createdAt: createdAt,
+    );
+  }
+
   Map<String, dynamic> toJson() => {
         'id': id,
         'isEnabled': isEnabled,
@@ -89,7 +127,7 @@ class PhantomMockRule {
       activeResponseId: json['activeResponseId'] as String?,
       ruleDescription: json['ruleDescription'] as String? ?? '',
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
     );
   }

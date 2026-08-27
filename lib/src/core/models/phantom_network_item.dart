@@ -14,6 +14,7 @@ class PhantomNetworkItem {
   final DateTime? completedAt;
   final int? durationMs;
   final DateTime createdAt;
+  final bool isMock;
 
   const PhantomNetworkItem({
     required this.id,
@@ -28,6 +29,7 @@ class PhantomNetworkItem {
     this.completedAt,
     this.durationMs,
     required this.createdAt,
+    this.isMock = false,
   });
 
   PhantomNetworkItem copyWith({
@@ -37,6 +39,7 @@ class PhantomNetworkItem {
     int? statusCode,
     DateTime? completedAt,
     int? durationMs,
+    bool? isMock,
   }) {
     return PhantomNetworkItem(
       id: id,
@@ -51,10 +54,17 @@ class PhantomNetworkItem {
       completedAt: completedAt ?? this.completedAt,
       durationMs: durationMs ?? this.durationMs,
       createdAt: createdAt,
+      isMock: isMock ?? this.isMock,
     );
   }
 
   bool get isPending => completedAt == null;
 
-  bool get isMock => responseHeaders == '[MOCK]';
+  /// Path portion of [url], falling back to the host or the raw string.
+  String get path {
+    if (url == null) return '';
+    final uri = Uri.tryParse(url!);
+    if (uri == null) return url!;
+    return uri.path.isEmpty ? uri.host : uri.path;
+  }
 }

@@ -22,6 +22,15 @@ class PhantomLogger extends ChangeNotifier {
     notifyListeners();
   }
 
+  void info(String message, {String? tag}) =>
+      log(PhantomLogLevel.info, message, tag: tag);
+
+  void warn(String message, {String? tag}) =>
+      log(PhantomLogLevel.warning, message, tag: tag);
+
+  void error(String message, {String? tag}) =>
+      log(PhantomLogLevel.error, message, tag: tag);
+
   void clearAll() {
     _logs.clear();
     notifyListeners();

@@ -1,8 +1,10 @@
 export 'src/phantom_main.dart';
 export 'src/phantom_overlay.dart';
+export 'src/core/models/phantom_feature.dart';
 export 'src/core/models/phantom_log_item.dart';
 export 'src/core/models/phantom_network_item.dart';
 export 'src/core/models/phantom_mock_rule.dart';
+export 'src/core/models/phantom_mock_collection.dart';
 export 'src/core/phantom_logger.dart';
 export 'src/core/phantom_network_logger.dart';
 export 'src/core/phantom_mock_interceptor.dart';

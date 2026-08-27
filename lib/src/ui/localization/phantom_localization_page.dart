@@ -205,7 +205,8 @@ class _PhantomLocalizationPageState extends State<PhantomLocalizationPage> {
               Expanded(
                 child: Text(entry.key, style: TextStyle(color: theme.info, fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'monospace')),
               ),
-              if (_localizer.groups.length > 1)
+              // Redundant once the list is already filtered to one group.
+              if (_localizer.groups.length > 1 && _selectedGroup == null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(color: theme.surfaceVariant, borderRadius: BorderRadius.circular(4)),

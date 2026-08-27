@@ -43,6 +43,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _seedSampleData() {
+    // Show every built-in module (the default is logs + network only).
+    Phantom.enableAllFeatures();
+
+    // A caller-supplied row appended to Phantom's menu.
+    Phantom.addCustomEntry(
+      title: 'Reset demo data',
+      icon: Icons.restart_alt,
+      action: () {
+        PhantomLogger.instance.clearAll();
+        PhantomNetworkLogger.instance.clearAll();
+        Phantom.logInfo('Demo data cleared', tag: 'Demo');
+      },
+    );
+
     Phantom.registerConfig('API Base URL', key: 'api_base_url', defaultValue: 'https://jsonplaceholder.typicode.com');
     Phantom.registerConfig('Enable Cache', key: 'enable_cache', defaultValue: 'true', type: PhantomConfigType.toggle, group: 'Performance');
     Phantom.registerConfig('Log Level', key: 'log_level', defaultValue: 'info', type: PhantomConfigType.picker, options: ['debug', 'info', 'warning', 'error'], group: 'General');
