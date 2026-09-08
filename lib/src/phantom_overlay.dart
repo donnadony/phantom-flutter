@@ -27,6 +27,11 @@ class PhantomOverlay extends StatefulWidget {
   /// already spend that shape on something else can pass their own.
   final IconData buttonIcon;
 
+  /// How solid the floating button is drawn, from 0 (invisible) to 1. Apps
+  /// that want it out of the way of screenshots and demos fade it; it still
+  /// takes taps and drags at any value.
+  final double buttonOpacity;
+
   /// Injected in tests so a shake can be driven without an accelerometer.
   @visibleForTesting
   final PhantomShakeDetector? shakeDetector;
@@ -39,6 +44,7 @@ class PhantomOverlay extends StatefulWidget {
     this.presentation = PhantomPresentation.fullScreen,
     this.initialSheetSize = 0.5,
     this.buttonIcon = Icons.bug_report_rounded,
+    this.buttonOpacity = 1,
     this.shakeDetector,
   }) : assert(
          initialSheetSize > 0 && initialSheetSize <= 1,
@@ -126,9 +132,12 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
                   }
                 },
                 onTap: _openPhantom,
-                child: _FloatingButton(
-                  theme: widget.theme ?? Phantom.theme,
-                  icon: widget.buttonIcon,
+                child: Opacity(
+                  opacity: widget.buttonOpacity,
+                  child: _FloatingButton(
+                    theme: widget.theme ?? Phantom.theme,
+                    icon: widget.buttonIcon,
+                  ),
                 ),
               ),
             ),
