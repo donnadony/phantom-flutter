@@ -10,7 +10,7 @@ abstract class PhantomDioInterceptorBase {
   final _mockInterceptor = PhantomMockInterceptor.instance;
   final Map<int, DateTime> _requestTimestamps = {};
 
-  void onRequestIntercept(
+  Future<void> onRequestIntercept(
     dynamic requestOptions, {
     required String method,
     required String url,
@@ -24,7 +24,7 @@ abstract class PhantomDioInterceptorBase {
       Map<String, dynamic> headers,
     )
     rejectWithMock,
-  }) {
+  }) async {
     final headersStr = _formatHeaders(headers);
     final bodyStr = _formatBody(data);
 
@@ -40,6 +40,9 @@ abstract class PhantomDioInterceptorBase {
 
     final mock = _mockInterceptor.mockResponse(method: method, url: url);
     if (mock != null) {
+      if (mock.delayMs > 0) {
+        await Future<void>.delayed(Duration(milliseconds: mock.delayMs));
+      }
       rejectWithMock(mock.statusCode, mock.body, {'X-Phantom-Mock': 'true'});
       return;
     }

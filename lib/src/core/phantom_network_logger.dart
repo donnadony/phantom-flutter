@@ -167,6 +167,7 @@ class PhantomNetworkLogger extends ChangeNotifier {
     required int statusCode,
     String headers = 'Content-Type: application/json',
     String body = '',
+    int durationMs = 0,
   }) {
     completeRequest(
       method: method,
@@ -174,7 +175,7 @@ class PhantomNetworkLogger extends ChangeNotifier {
       statusCode: statusCode,
       responseHeaders: headers,
       responseBody: body,
-      durationMs: 0,
+      durationMs: durationMs,
       isMock: true,
     );
   }

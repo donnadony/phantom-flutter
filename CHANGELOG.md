@@ -1,3 +1,22 @@
+## 0.0.6
+
+### Added
+
+* **The floating button tucks into an edge handle.** Drag it off the side of the screen and it collapses to an 18pt tab flush with that edge, chevron pointing back inward; tapping the tab restores the button where it was, and dragging the tab slides it up and down the edge. It is the gesture Samsung's Edge panels use, and unlike hiding the button it leaves something on screen to tap — nothing to discover, nothing to remember. A drag that stops before the edge still snaps to the nearer side.
+
+* **A mock can take its time.** Each response carries a delay — none, 0.5s, 1s, 3s or 10s from the editor — so a spinner, a timeout or a race can be reproduced on demand instead of waited for. `mockResponse` still answers immediately and hands the delay back on the hit, because the wait belongs to whoever serves the mock; the bundled dio interceptor awaits it before rejecting. The Network inspector reports the delay as the call's duration, so a mocked call no longer claims to have taken 0ms.
+
+### Changed
+
+* **The Network inspector reads durations in seconds, not milliseconds.** `1200ms` was a number to convert before it meant anything; `1.2 s` is the unit the eye already thinks in. Under a second it reads in hundredths (`0.35 s`), up to ten in tenths, and past that in whole seconds. The "Slow" filter is labelled `Slow >1 s` to match.
+
+* **A duration is green or red, not red or grey.** It was the error colour past a second and the muted foreground otherwise, which left "fast" looking like an absence of information. It now uses the theme's `success` below the threshold and `error` above it — one threshold, `phantomSlowRequestMs`, shared by the colour, the filter and the label instead of the three hardcoded `1000`s it replaced.
+
+### Breaking
+
+* `PhantomDioInterceptorBase.onRequestIntercept` returns `Future<void>` instead of `void`, so it can wait a mock's delay out. Callers that ignore the return value need no change.
+* `PhantomMockHit` gains a `delayMs` field.
+
 ## 0.0.5
 
 ### Added

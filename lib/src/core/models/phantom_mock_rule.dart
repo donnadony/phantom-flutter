@@ -9,6 +9,7 @@ class PhantomMockResponse {
   String httpMethod;
   int statusCode;
   String responseBody;
+  int delayMs;
 
   PhantomMockResponse({
     required this.id,
@@ -16,6 +17,7 @@ class PhantomMockResponse {
     this.httpMethod = 'ANY',
     this.statusCode = 200,
     this.responseBody = '{\n  \n}',
+    this.delayMs = 0,
   });
 
   PhantomMockResponse copyWith({
@@ -23,6 +25,7 @@ class PhantomMockResponse {
     String? httpMethod,
     int? statusCode,
     String? responseBody,
+    int? delayMs,
   }) {
     return PhantomMockResponse(
       id: id,
@@ -30,6 +33,7 @@ class PhantomMockResponse {
       httpMethod: httpMethod ?? this.httpMethod,
       statusCode: statusCode ?? this.statusCode,
       responseBody: responseBody ?? this.responseBody,
+      delayMs: delayMs ?? this.delayMs,
     );
   }
 
@@ -39,6 +43,7 @@ class PhantomMockResponse {
     'httpMethod': httpMethod,
     'statusCode': statusCode,
     'responseBody': responseBody,
+    'delayMs': delayMs,
   };
 
   factory PhantomMockResponse.fromJson(Map<String, dynamic> json) {
@@ -48,6 +53,7 @@ class PhantomMockResponse {
       httpMethod: json['httpMethod'] as String? ?? 'ANY',
       statusCode: json['statusCode'] as int? ?? 200,
       responseBody: json['responseBody'] as String? ?? '',
+      delayMs: json['delayMs'] as int? ?? 0,
     );
   }
 }

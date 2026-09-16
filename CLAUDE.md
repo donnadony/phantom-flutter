@@ -119,6 +119,7 @@ final mock = Phantom.mockResponse(method: 'GET', url: requestUrl);
 if (mock != null) {
   // Serve mock.statusCode / mock.body instead of the real request.
   // The call is already recorded in the Network inspector, flagged MOCK.
+  // mock.delayMs is the wait the rule asks for; the caller owns it.
   return;
 }
 ```
@@ -153,7 +154,7 @@ Phantom.completeRequest(method:, url:, requestHeaders:, requestBody:, statusCode
 Phantom.logExternalEntry(Map data, sourcePrefix:);
 
 // Mocks
-Phantom.mockResponse(method:, url:);        // (statusCode, body, headers)? — also logs the hit
+Phantom.mockResponse(method:, url:);        // (statusCode, body, headers, delayMs)? — also logs the hit
 Phantom.loadMocks();                        // reload persisted rules
 Phantom.loadMocksFromAsset(assetPath);      // merge a bundled collection → count?
 Phantom.loadMocksFromJson(jsonString);      // merge raw JSON → count?
@@ -207,12 +208,14 @@ This is a Flutter package (Flutter 3.29+, Dart 3.9+) with a single `phantom_flut
 
 - **State management**: Plain `ChangeNotifier` — no external state dependency
 - **Theme**: `PhantomTheme` with Kodivex dark defaults via `PhantomThemeProvider` (InheritedWidget)
-- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`
+- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`. Dragged off a side it tucks into an edge handle; tapping the handle brings it back
 - **Menu**: driven by `PhantomFeature` + `Phantom.customEntries`, not hardcoded
 
 ### Mock matching rules
 
 Patterns are matched against the URL **path**, not the full URL, so `/v1/users` is not accidentally satisfied by `?redirect=/v1/users`. A rule matches when its method (or `ANY`) and its active response's method both accept the request method. A hit is recorded in the Network inspector automatically — do not log it a second time from your HTTP layer.
+
+A response can also carry a `delayMs`. `mockResponse` never waits: it returns the hit at once with the delay on it, and whoever serves the mock does the waiting. `PhantomDioInterceptorBase.onRequestIntercept` is `async` for that reason and awaits before it rejects.
 
 ### Dependencies
 

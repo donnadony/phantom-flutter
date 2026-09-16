@@ -6,6 +6,7 @@ import '../../core/models/phantom_network_item.dart';
 import '../../core/phantom_mock_interceptor.dart';
 import '../../theme/phantom_theme.dart';
 import '../../utils/curl_builder.dart';
+import '../../utils/phantom_duration_format.dart';
 import '../../utils/json_formatter.dart';
 import '../mock/phantom_mock_edit_page.dart';
 import 'phantom_json_tree_view.dart';
@@ -128,13 +129,11 @@ class _PhantomNetworkDetailPageState extends State<PhantomNetworkDetailPage> {
                     ),
                   ),
                 ),
-              if (_item.durationMs != null)
+              if (_item.durationMs case final duration?)
                 Text(
-                  '${_item.durationMs}ms',
+                  phantomFormatDuration(duration),
                   style: TextStyle(
-                    color: _item.durationMs! > 1000
-                        ? theme.error
-                        : theme.onBackgroundVariant,
+                    color: theme.durationColor(duration),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),

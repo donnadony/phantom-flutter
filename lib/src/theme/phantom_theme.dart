@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../utils/phantom_duration_format.dart';
+
 class PhantomTheme {
   final Color background;
   final Color surface;
@@ -99,6 +101,10 @@ class PhantomTheme {
     if (code >= 200 && code < 300) return success;
     if (code >= 300 && code < 500) return warning;
     return error;
+  }
+
+  Color durationColor(int milliseconds) {
+    return milliseconds > phantomSlowRequestMs ? error : success;
   }
 
   Color statusBackgroundColor(int code) {
