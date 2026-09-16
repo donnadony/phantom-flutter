@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/models/phantom_mock_rule.dart';
 import '../../theme/phantom_theme.dart';
+import 'phantom_delay_picker.dart';
 import 'phantom_response_edit_page.dart';
 import 'phantom_status_code_picker.dart';
 
@@ -31,6 +32,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
 
   String _httpMethod = 'ANY';
   int _statusCode = 200;
+  int _delayMs = 0;
   late List<PhantomMockResponse> _responses;
   String? _activeResponseId;
 
@@ -58,6 +60,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
     final active = rule?.activeResponse;
     _httpMethod = active?.httpMethod ?? rule?.httpMethod ?? 'ANY';
     _statusCode = active?.statusCode ?? 200;
+    _delayMs = active?.delayMs ?? 0;
     _responseBodyController = TextEditingController(
       text: active?.responseBody ?? '{\n  \n}',
     );
@@ -171,6 +174,14 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
               ],
             ),
           ),
+        ),
+        const SizedBox(height: 16),
+        _sectionLabel('Delay', theme),
+        const SizedBox(height: 8),
+        PhantomDelayPicker(
+          delayMs: _delayMs,
+          theme: theme,
+          onChanged: (value) => setState(() => _delayMs = value),
         ),
         const SizedBox(height: 16),
         _sectionLabel('Response Body (JSON)', theme),
@@ -349,6 +360,17 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
                             fontSize: 11,
                           ),
                         ),
+                        if (response.delayMs > 0) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            phantomMockDelayLabel(response.delayMs),
+                            style: TextStyle(
+                              color: theme.warning,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ],
@@ -560,6 +582,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
       if (remaining != null && _responses.length == 1) {
         _httpMethod = remaining.httpMethod;
         _statusCode = remaining.statusCode;
+        _delayMs = remaining.delayMs;
         _responseBodyController.text = remaining.responseBody;
       }
     });
@@ -575,6 +598,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
         httpMethod: _httpMethod,
         statusCode: _statusCode,
         responseBody: _responseBodyController.text,
+        delayMs: _delayMs,
       );
       _responses.add(created);
       _activeResponseId = created.id;
@@ -583,6 +607,7 @@ class _PhantomMockEditPageState extends State<PhantomMockEditPage> {
         httpMethod: _httpMethod,
         statusCode: _statusCode,
         responseBody: _responseBodyController.text,
+        delayMs: _delayMs,
       );
       _activeResponseId = _responses[0].id;
     }

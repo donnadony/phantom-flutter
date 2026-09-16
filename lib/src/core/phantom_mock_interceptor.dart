@@ -6,7 +6,12 @@ import 'models/phantom_mock_rule.dart';
 import 'phantom_network_logger.dart';
 
 /// Result of a successful mock match.
-typedef PhantomMockHit = ({int statusCode, String body, String headers});
+typedef PhantomMockHit = ({
+  int statusCode,
+  String body,
+  String headers,
+  int delayMs,
+});
 
 class PhantomMockInterceptor extends ChangeNotifier {
   PhantomMockInterceptor._();
@@ -111,12 +116,14 @@ class PhantomMockInterceptor extends ChangeNotifier {
       statusCode: response.statusCode,
       headers: _mockHeaders,
       body: response.responseBody,
+      durationMs: response.delayMs,
     );
 
     return (
       statusCode: response.statusCode,
       body: response.responseBody,
       headers: _mockHeaders,
+      delayMs: response.delayMs,
     );
   }
 

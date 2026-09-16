@@ -6,6 +6,14 @@ import 'ui/phantom_sheet.dart';
 import 'ui/phantom_view.dart';
 import 'utils/phantom_shake_detector.dart';
 
+const phantomFloatingButtonKey = Key('phantom_floating_button');
+const phantomEdgeHandleKey = Key('phantom_edge_handle');
+
+const _buttonSize = 44.0;
+const _buttonMargin = 16.0;
+const _handleWidth = 18.0;
+const _edgeSlop = 6.0;
+
 class PhantomOverlay extends StatefulWidget {
   final Widget child;
   final bool showFloatingButton;
@@ -27,6 +35,11 @@ class PhantomOverlay extends StatefulWidget {
   /// already spend that shape on something else can pass their own.
   final IconData buttonIcon;
 
+  /// How solid the floating button is drawn, from 0 (invisible) to 1. Apps
+  /// that want it out of the way of screenshots and demos fade it; it still
+  /// takes taps and drags at any value.
+  final double buttonOpacity;
+
   /// Injected in tests so a shake can be driven without an accelerometer.
   @visibleForTesting
   final PhantomShakeDetector? shakeDetector;
@@ -39,6 +52,7 @@ class PhantomOverlay extends StatefulWidget {
     this.presentation = PhantomPresentation.fullScreen,
     this.initialSheetSize = 0.5,
     this.buttonIcon = Icons.bug_report_rounded,
+    this.buttonOpacity = 1,
     this.shakeDetector,
   }) : assert(
          initialSheetSize > 0 && initialSheetSize <= 1,
@@ -51,9 +65,11 @@ class PhantomOverlay extends StatefulWidget {
 }
 
 class _PhantomOverlayState extends State<PhantomOverlay> {
-  Offset _buttonPosition = const Offset(16, 100);
+  Offset _buttonPosition = const Offset(_buttonMargin, 100);
   bool _hasDragged = false;
   bool _phantomOpen = false;
+  bool _tuckedLeft = false;
+  bool _tucked = false;
 
   /// Deliberately not persisted. Hiding the button is for getting it out of
   /// the way of the screen underneath, and a restart is then a guaranteed way
@@ -104,7 +120,40 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
       child: Stack(
         children: [
           widget.child,
-          if (!_phantomOpen && !_buttonHidden)
+          if (!_phantomOpen && !_buttonHidden && _tucked)
+            Positioned(
+              left: _tuckedLeft ? 0 : null,
+              right: _tuckedLeft ? null : 0,
+              top: _buttonPosition.dy,
+              child: GestureDetector(
+                key: phantomEdgeHandleKey,
+                onPanUpdate: (details) {
+                  _hasDragged = true;
+                  setState(() {
+                    _buttonPosition += Offset(0, details.delta.dy);
+                  });
+                },
+                onPanStart: (_) {
+                  _hasDragged = false;
+                },
+                onPanEnd: (_) {
+                  if (_hasDragged) {
+                    _clampVertically();
+                  } else {
+                    _untuck();
+                  }
+                },
+                onTap: _untuck,
+                child: Opacity(
+                  opacity: widget.buttonOpacity,
+                  child: _EdgeHandle(
+                    theme: widget.theme ?? Phantom.theme,
+                    onLeftEdge: _tuckedLeft,
+                  ),
+                ),
+              ),
+            ),
+          if (!_phantomOpen && !_buttonHidden && !_tucked)
             Positioned(
               left: _buttonPosition.dx,
               top: _buttonPosition.dy,
@@ -120,15 +169,19 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
                 },
                 onPanEnd: (_) {
                   if (_hasDragged) {
-                    _snapToEdge();
+                    _settleAfterDrag();
                   } else {
                     _openPhantom();
                   }
                 },
                 onTap: _openPhantom,
-                child: _FloatingButton(
-                  theme: widget.theme ?? Phantom.theme,
-                  icon: widget.buttonIcon,
+                child: Opacity(
+                  opacity: widget.buttonOpacity,
+                  child: _FloatingButton(
+                    key: phantomFloatingButtonKey,
+                    theme: widget.theme ?? Phantom.theme,
+                    icon: widget.buttonIcon,
+                  ),
                 ),
               ),
             ),
@@ -155,15 +208,53 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
     );
   }
 
+  void _settleAfterDrag() {
+    final size = MediaQuery.of(context).size;
+    final pastLeft = _buttonPosition.dx < -_edgeSlop;
+    final pastRight = _buttonPosition.dx + _buttonSize > size.width + _edgeSlop;
+
+    if (pastLeft || pastRight) {
+      setState(() {
+        _tucked = true;
+        _tuckedLeft = pastLeft;
+        _buttonPosition = Offset(
+          pastLeft ? _buttonMargin : size.width - _buttonSize - _buttonMargin,
+          _clampedTop(size),
+        );
+      });
+      return;
+    }
+
+    _snapToEdge();
+  }
+
   void _snapToEdge() {
     final size = MediaQuery.of(context).size;
     final midX = size.width / 2;
     setState(() {
       _buttonPosition = Offset(
-        _buttonPosition.dx < midX ? 16 : size.width - 60,
-        _buttonPosition.dy.clamp(50.0, size.height - 100),
+        _buttonPosition.dx < midX
+            ? _buttonMargin
+            : size.width - _buttonSize - _buttonMargin,
+        _clampedTop(size),
       );
     });
+  }
+
+  void _clampVertically() {
+    final size = MediaQuery.of(context).size;
+    setState(() {
+      _buttonPosition = Offset(_buttonPosition.dx, _clampedTop(size));
+    });
+  }
+
+  double _clampedTop(Size size) {
+    return _buttonPosition.dy.clamp(50.0, size.height - 100);
+  }
+
+  void _untuck() {
+    if (!mounted) return;
+    setState(() => _tucked = false);
   }
 
   void _openPhantom() {
@@ -209,17 +300,54 @@ class _PhantomApp extends StatelessWidget {
   }
 }
 
+class _EdgeHandle extends StatelessWidget {
+  final PhantomTheme theme;
+  final bool onLeftEdge;
+
+  const _EdgeHandle({required this.theme, required this.onLeftEdge});
+
+  @override
+  Widget build(BuildContext context) {
+    final rounded = Radius.circular(_buttonSize / 2);
+    return Container(
+      width: _handleWidth,
+      height: _buttonSize,
+      decoration: BoxDecoration(
+        color: theme.primaryContainer,
+        borderRadius: BorderRadius.only(
+          topRight: onLeftEdge ? rounded : Radius.zero,
+          bottomRight: onLeftEdge ? rounded : Radius.zero,
+          topLeft: onLeftEdge ? Radius.zero : rounded,
+          bottomLeft: onLeftEdge ? Radius.zero : rounded,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Icon(
+        onLeftEdge ? Icons.chevron_right : Icons.chevron_left,
+        color: theme.onPrimary,
+        size: 16,
+      ),
+    );
+  }
+}
+
 class _FloatingButton extends StatelessWidget {
   final PhantomTheme theme;
   final IconData icon;
 
-  const _FloatingButton({required this.theme, required this.icon});
+  const _FloatingButton({super.key, required this.theme, required this.icon});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 44,
-      height: 44,
+      width: _buttonSize,
+      height: _buttonSize,
       decoration: BoxDecoration(
         color: theme.primaryContainer,
         shape: BoxShape.circle,
