@@ -77,6 +77,25 @@ void main() {
     expect(tester.getRect(handle()).top, 220);
   });
 
+  testWidgets('a grab anywhere on the button reaches the tuck', (tester) async {
+    await tester.pumpWidget(harness());
+
+    await dragBy(tester, button(), const Offset(-26, 0));
+
+    expect(handle(), findsOneWidget);
+  });
+
+  testWidgets('a button left barely over the edge does not tuck', (
+    tester,
+  ) async {
+    await tester.pumpWidget(harness());
+
+    await dragBy(tester, button(), const Offset(-20, 0));
+
+    expect(handle(), findsNothing);
+    expect(tester.getRect(button()).left, 16);
+  });
+
   testWidgets('a drag that stays on screen snaps without tucking', (
     tester,
   ) async {

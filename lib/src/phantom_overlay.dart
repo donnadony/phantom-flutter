@@ -12,7 +12,7 @@ const phantomEdgeHandleKey = Key('phantom_edge_handle');
 const _buttonSize = 44.0;
 const _buttonMargin = 16.0;
 const _handleWidth = 18.0;
-const _edgeSlop = 12.0;
+const _edgeSlop = 6.0;
 
 class PhantomOverlay extends StatefulWidget {
   final Widget child;
