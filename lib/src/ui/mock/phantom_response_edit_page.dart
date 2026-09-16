@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../core/models/phantom_mock_rule.dart';
 import '../../theme/phantom_theme.dart';
+import 'phantom_delay_picker.dart';
 import 'phantom_status_code_picker.dart';
 
 /// Editor for a single response inside a multi-response mock rule.
@@ -32,6 +33,7 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
   late TextEditingController _bodyController;
   late String _httpMethod;
   late int _statusCode;
+  late int _delayMs;
 
   bool get _isEditing => widget.existingResponse != null;
 
@@ -49,6 +51,7 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
     );
     _httpMethod = existing?.httpMethod ?? widget.defaultMethod;
     _statusCode = existing?.statusCode ?? 200;
+    _delayMs = existing?.delayMs ?? 0;
   }
 
   @override
@@ -169,6 +172,14 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
               ),
             ),
             const SizedBox(height: 16),
+            _label('Delay', theme),
+            const SizedBox(height: 8),
+            PhantomDelayPicker(
+              delayMs: _delayMs,
+              theme: theme,
+              onChanged: (value) => setState(() => _delayMs = value),
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
                 _label('Response Body (JSON)', theme),
@@ -276,6 +287,7 @@ class _PhantomResponseEditPageState extends State<PhantomResponseEditPage> {
       httpMethod: _httpMethod,
       statusCode: _statusCode,
       responseBody: _bodyController.text,
+      delayMs: _delayMs,
     );
     Navigator.of(context).pop(response);
   }

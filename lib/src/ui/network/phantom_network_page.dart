@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/models/phantom_network_item.dart';
 import '../../core/phantom_network_logger.dart';
 import '../../theme/phantom_theme.dart';
+import '../../utils/phantom_duration_format.dart';
 import '../../utils/phantom_exporter.dart';
 import 'phantom_network_detail_page.dart';
 
@@ -41,7 +42,9 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
         list = list.where((i) => (i.statusCode ?? 0) >= 400).toList();
         break;
       case _FilterType.slow:
-        list = list.where((i) => (i.durationMs ?? 0) > 1000).toList();
+        list = list
+            .where((i) => (i.durationMs ?? 0) > phantomSlowRequestMs)
+            .toList();
         break;
       case _FilterType.all:
         break;
@@ -157,7 +160,7 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
     final filters = {
       _FilterType.all: 'All',
       _FilterType.errors: 'Errors',
-      _FilterType.slow: 'Slow >1s',
+      _FilterType.slow: 'Slow >1 s',
     };
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -286,14 +289,12 @@ class _PhantomNetworkPageState extends State<PhantomNetworkPage> {
                           fontSize: 12,
                         ),
                       ),
-                      if (item.durationMs != null) ...[
+                      if (item.durationMs case final duration?) ...[
                         const SizedBox(width: 8),
                         Text(
-                          '${item.durationMs}ms',
+                          phantomFormatDuration(duration),
                           style: TextStyle(
-                            color: item.durationMs! > 1000
-                                ? theme.error
-                                : theme.onBackgroundVariant,
+                            color: theme.durationColor(duration),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),

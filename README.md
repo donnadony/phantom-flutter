@@ -106,6 +106,18 @@ Hiding lasts the session only, so restarting the app also brings the button
 back — which matters on desktop and web, where there is no accelerometer and
 the shake gesture does nothing.
 
+### 1d. Tuck it against the edge
+
+Drag the floating button off the side of the screen and it tucks into a
+handle: an 18pt tab flush with that edge, with a chevron pointing back inward.
+Tap it and the button returns where it was. Drag the handle itself to slide it
+up or down the edge.
+
+It is the Samsung Edge-panel gesture, and unlike hiding the button it leaves
+something on screen to tap, so there is nothing to discover and nothing to
+remember. A drag that stops before the edge still snaps to the nearer side the
+way it always did.
+
 ### 2. Log messages
 
 ```dart
@@ -188,12 +200,21 @@ Intercept network requests and return mock responses at runtime. Rules persist a
 // Check for mock before making a real request
 final mock = Phantom.mockResponse(method: 'GET', url: requestUrl);
 if (mock != null) {
+  if (mock.delayMs > 0) {
+    await Future<void>.delayed(Duration(milliseconds: mock.delayMs));
+  }
   // Use mock.statusCode, mock.body, mock.headers
   return;
 }
 
 // Proceed with real request...
 ```
+
+**Every response can take its time.** The editor offers none, 0.5s, 1s, 3s and
+10s, which is how a spinner, a timeout or a race gets reproduced on demand. The
+wait belongs to the caller: `mockResponse` answers immediately and hands back
+`delayMs` for you to honour, and the bundled dio interceptor already does. The
+Network inspector reports the delay as the call's duration.
 
 You can also create mocks from the UI:
 - Open **Network** → tap a request → tap **"Mock this"**
