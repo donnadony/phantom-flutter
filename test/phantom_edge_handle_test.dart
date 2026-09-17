@@ -1,18 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phantom_flutter/phantom_flutter.dart';
-import 'package:phantom_flutter/src/utils/phantom_shake_detector.dart';
 
 void main() {
-  late StreamController<PhantomAcceleration> shakes;
-
-  setUp(() => shakes = StreamController<PhantomAcceleration>.broadcast());
-  tearDown(() => shakes.close());
-
   Widget harness() => PhantomOverlay(
-    shakeDetector: PhantomShakeDetector(source: () => shakes.stream),
     child: const MaterialApp(home: Scaffold(body: Text('the app'))),
   );
 

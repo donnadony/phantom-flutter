@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phantom_flutter/phantom_flutter.dart';
 import 'package:phantom_flutter/src/core/phantom_button_placement.dart';
-import 'package:phantom_flutter/src/utils/phantom_shake_detector.dart';
 
 class _RecordingStore implements PhantomButtonPlacementStore {
   _RecordingStore([this.stored]);
@@ -34,13 +33,7 @@ class _BrokenStore implements PhantomButtonPlacementStore {
 }
 
 void main() {
-  late StreamController<PhantomAcceleration> shakes;
-
-  setUp(() => shakes = StreamController<PhantomAcceleration>.broadcast());
-  tearDown(() => shakes.close());
-
   Widget harness(PhantomButtonPlacementStore store) => PhantomOverlay(
-    shakeDetector: PhantomShakeDetector(source: () => shakes.stream),
     placementStore: store,
     child: const MaterialApp(home: Scaffold(body: Text('the app'))),
   );

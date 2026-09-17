@@ -208,7 +208,7 @@ This is a Flutter package (Flutter 3.29+, Dart 3.9+) with a single `phantom_flut
 
 - **State management**: Plain `ChangeNotifier` — no external state dependency
 - **Theme**: `PhantomTheme` with Kodivex dark defaults via `PhantomThemeProvider` (InheritedWidget)
-- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`. Dragged off a side it tucks into an edge handle; tapping the handle brings it back. Where it sits, and whether it is tucked, are kept in SharedPreferences through `PhantomButtonPlacementStore` and restored on the next launch — hiding it is not kept, so a restart always brings it back
+- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`. Dragged off a side it tucks into an edge handle; tapping the handle brings it back. Where it sits, and whether it is tucked, are kept in SharedPreferences through `PhantomButtonPlacementStore` and restored on the next launch — the panel no longer offers to hide it: the handle replaced that, and left nothing on screen to look for
 - **Menu**: driven by `PhantomFeature` + `Phantom.customEntries`, not hardcoded
 
 ### Mock matching rules
@@ -224,7 +224,6 @@ A response can also carry a `delayMs`. `mockResponse` never waits: it returns th
 - `url_launcher` (deep link tester)
 - `share_plus` (exporting logs / network / mocks)
 - `file_picker` (importing mock collections)
-- `sensors_plus` (shake to reopen once the floating button is hidden)
 
 ### Known platform gaps vs phantom-ios
 
