@@ -208,7 +208,7 @@ This is a Flutter package (Flutter 3.29+, Dart 3.9+) with a single `phantom_flut
 
 - **State management**: Plain `ChangeNotifier` — no external state dependency
 - **Theme**: `PhantomTheme` with Kodivex dark defaults via `PhantomThemeProvider` (InheritedWidget)
-- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`. Dragged off a side it tucks into an edge handle; tapping the handle brings it back
+- **Overlay**: `PhantomOverlay` wraps the host app with a draggable floating button + internal `MaterialApp`. Dragged off a side it tucks into an edge handle; tapping the handle brings it back. Where it sits, and whether it is tucked, are kept in SharedPreferences through `PhantomButtonPlacementStore` and restored on the next launch — hiding it is not kept, so a restart always brings it back
 - **Menu**: driven by `PhantomFeature` + `Phantom.customEntries`, not hardcoded
 
 ### Mock matching rules

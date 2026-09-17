@@ -118,6 +118,10 @@ something on screen to tap, so there is nothing to discover and nothing to
 remember. A drag that stops before the edge still snaps to the nearer side the
 way it always did.
 
+**Where you leave it is where it comes back.** The position and whether it is
+tucked survive a restart, kept in SharedPreferences. Hiding it does not: a
+hidden button leaves nothing to tap, so a restart stays a guaranteed way back.
+
 ### 2. Log messages
 
 ```dart
