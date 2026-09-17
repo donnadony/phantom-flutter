@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import 'core/phantom_button_placement.dart';
 import 'phantom_main.dart';
 import 'theme/phantom_theme.dart';
 import 'ui/phantom_sheet.dart';
@@ -44,6 +47,11 @@ class PhantomOverlay extends StatefulWidget {
   @visibleForTesting
   final PhantomShakeDetector? shakeDetector;
 
+  /// Where the button's place on screen is remembered between launches.
+  /// Defaults to SharedPreferences; injected in tests so they touch no disk.
+  @visibleForTesting
+  final PhantomButtonPlacementStore? placementStore;
+
   const PhantomOverlay({
     super.key,
     required this.child,
@@ -54,6 +62,7 @@ class PhantomOverlay extends StatefulWidget {
     this.buttonIcon = Icons.bug_report_rounded,
     this.buttonOpacity = 1,
     this.shakeDetector,
+    this.placementStore,
   }) : assert(
          initialSheetSize > 0 && initialSheetSize <= 1,
          'initialSheetSize is a fraction of the screen. At 0 the panel has no '
@@ -80,6 +89,9 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
   late final PhantomShakeDetector _shake =
       widget.shakeDetector ?? PhantomShakeDetector();
 
+  late final PhantomButtonPlacementStore _placements =
+      widget.placementStore ?? const SharedPreferencesPlacementStore();
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +99,42 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
       Phantom.setTheme(widget.theme!);
     }
     Phantom.loadMocks();
+    unawaited(_restorePlacement());
+  }
+
+  /// The button is drawn at its default place first and moves when the store
+  /// answers, rather than waiting: a slow read would otherwise leave the screen
+  /// without its way into the panel.
+  Future<void> _restorePlacement() async {
+    PhantomButtonPlacement? read;
+    try {
+      read = await _placements.read();
+    } on Object {
+      return;
+    }
+
+    final stored = read;
+    if (stored == null || !mounted) return;
+
+    setState(() {
+      _buttonPosition = Offset(stored.dx, stored.dy);
+      _tucked = stored.tucked;
+      _tuckedLeft = stored.tuckedLeft;
+    });
+  }
+
+  /// Written on every settle, never on every frame of a drag.
+  void _rememberPlacement() {
+    unawaited(
+      _placements
+          .write((
+            dx: _buttonPosition.dx,
+            dy: _buttonPosition.dy,
+            tucked: _tucked,
+            tuckedLeft: _tuckedLeft,
+          ))
+          .catchError((Object _) {}),
+    );
   }
 
   @override
@@ -222,6 +270,7 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
           _clampedTop(size),
         );
       });
+      _rememberPlacement();
       return;
     }
 
@@ -239,6 +288,7 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
         _clampedTop(size),
       );
     });
+    _rememberPlacement();
   }
 
   void _clampVertically() {
@@ -246,6 +296,7 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
     setState(() {
       _buttonPosition = Offset(_buttonPosition.dx, _clampedTop(size));
     });
+    _rememberPlacement();
   }
 
   double _clampedTop(Size size) {
@@ -255,6 +306,7 @@ class _PhantomOverlayState extends State<PhantomOverlay> {
   void _untuck() {
     if (!mounted) return;
     setState(() => _tucked = false);
+    _rememberPlacement();
   }
 
   void _openPhantom() {

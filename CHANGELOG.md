@@ -1,3 +1,15 @@
+## 0.0.7
+
+### Added
+
+* **The floating button stays where it was put.** Its place on screen, and whether it is tucked into an edge handle or sitting free, survive a restart. Dragging it out of the way used to last until the next launch, which on a screen you are inspecting over several runs means moving it again every time.
+
+  Written on every settle — a snap, a tuck, a tap on the handle, a slide along the edge — never on a frame of the drag. Read once at startup, and the button is drawn at its default place first rather than waiting on the read: a slow disk would otherwise leave the screen without its way into the panel.
+
+  `PhantomButtonPlacementStore` is the seam. The default keeps one JSON row in SharedPreferences under `phantom_button_placement`; a row it did not write — a half-written string, an older shape, another tool's key — is a miss and the button falls back to its default place. Tests inject their own store and touch no disk.
+
+  **Hiding the button is still not persisted**, and deliberately: a hidden button leaves nothing on screen to tap, so a restart has to be a guaranteed way back on every platform, including the ones with no accelerometer to shake.
+
 ## 0.0.6
 
 ### Added
