@@ -1,18 +1,9 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:phantom_flutter/phantom_flutter.dart';
-import 'package:phantom_flutter/src/utils/phantom_shake_detector.dart';
 
 void main() {
-  late StreamController<PhantomAcceleration> shakes;
-
-  setUp(() => shakes = StreamController<PhantomAcceleration>.broadcast());
-  tearDown(() => shakes.close());
-
   Widget harness({double? buttonOpacity}) => PhantomOverlay(
-    shakeDetector: PhantomShakeDetector(source: () => shakes.stream),
     buttonOpacity: buttonOpacity ?? 1,
     child: const MaterialApp(home: Scaffold(body: Text('the app'))),
   );
@@ -44,6 +35,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.bug_report_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.text('Hide floating button'), findsOneWidget);
+    expect(find.text('Phantom'), findsOneWidget);
+    expect(find.text('Network'), findsOneWidget);
   });
 }

@@ -96,31 +96,19 @@ Drag the handle down past a quarter of the screen, or tap outside, to close.
 
 `fullScreen` remains the default, so this changes nothing for existing callers.
 
-### 1c. Get the button out of the way
-
-The panel's last row hides the floating button when it covers what you are
-trying to look at. Shake the device to bring Phantom back, and the same row
-restores the button.
-
-Hiding lasts the session only, so restarting the app also brings the button
-back — which matters on desktop and web, where there is no accelerometer and
-the shake gesture does nothing.
-
-### 1d. Tuck it against the edge
+### 1c. Tuck it against the edge
 
 Drag the floating button off the side of the screen and it tucks into a
 handle: an 18pt tab flush with that edge, with a chevron pointing back inward.
 Tap it and the button returns where it was. Drag the handle itself to slide it
 up or down the edge.
 
-It is the Samsung Edge-panel gesture, and unlike hiding the button it leaves
-something on screen to tap, so there is nothing to discover and nothing to
-remember. A drag that stops before the edge still snaps to the nearer side the
+It is the Samsung Edge-panel gesture: it leaves something on screen to tap, so
+there is nothing to discover and nothing to remember. A drag that stops before the edge still snaps to the nearer side the
 way it always did.
 
 **Where you leave it is where it comes back.** The position and whether it is
-tucked survive a restart, kept in SharedPreferences. Hiding it does not: a
-hidden button leaves nothing to tap, so a restart stays a guaranteed way back.
+tucked survive a restart, kept in SharedPreferences.
 
 ### 2. Log messages
 
@@ -396,7 +384,6 @@ phantom_flutter/
 | `url_launcher` | Deep link tester |
 | `share_plus` | Exporting logs, network captures, and mocks |
 | `file_picker` | Importing mock collections |
-| `sensors_plus` | Shake to reopen once the floating button is hidden |
 
 All are first-party Flutter community packages. No third-party dependencies.
 

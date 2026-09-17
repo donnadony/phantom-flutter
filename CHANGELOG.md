@@ -1,3 +1,20 @@
+## 0.0.8
+
+### Removed
+
+* **"Hide floating button" is gone from the panel**, and with it the shake gesture and the `sensors_plus` dependency.
+
+  It existed to get the button off a screen you were inspecting. The edge handle does that better: it leaves a tab on screen to tap, so there is nothing to discover and nothing to remember, while hiding left the button reachable only by shaking the device — a gesture with no trace on screen, that a simulator cannot perform, and that the row had to spend two lines teaching.
+
+  With the handle now remembering where it was left, hiding had nothing the handle does not do.
+
+  Removing it takes a native plugin out of every host app that embeds Phantom, which matters to the ones that audit what the toolkit links in.
+
+### Breaking
+
+* `PhantomOverlay.shakeDetector` is gone, along with `PhantomShakeDetector`.
+* `PhantomView` and `PhantomSheet` no longer take `onToggleButton` or `buttonHidden`.
+
 ## 0.0.7
 
 ### Added

@@ -10,18 +10,9 @@ class PhantomView extends StatelessWidget {
   ///
   /// Null when there is no floating button to act on — `Phantom.show(context)`
   /// pushes the panel with no overlay behind it — and the row is left out.
-  final VoidCallback? onToggleButton;
-
   /// Whether the floating button is currently hidden, which decides whether the
   /// row offers to hide or to restore it.
-  final bool buttonHidden;
-
-  const PhantomView({
-    super.key,
-    this.onClose,
-    this.onToggleButton,
-    this.buttonHidden = false,
-  });
+  const PhantomView({super.key, this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -44,26 +35,14 @@ class PhantomView extends StatelessWidget {
           onPressed: onClose ?? () => Navigator.of(context).pop(),
         ),
       ),
-      body: PhantomViewBody(
-        onClose: onClose,
-        onToggleButton: onToggleButton,
-        buttonHidden: buttonHidden,
-      ),
+      body: PhantomViewBody(onClose: onClose),
     );
   }
 }
 
 class PhantomViewBody extends StatelessWidget {
   final VoidCallback? onClose;
-  final VoidCallback? onToggleButton;
-  final bool buttonHidden;
-
-  const PhantomViewBody({
-    super.key,
-    this.onClose,
-    this.onToggleButton,
-    this.buttonHidden = false,
-  });
+  const PhantomViewBody({super.key, this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -90,31 +69,7 @@ class PhantomViewBody extends StatelessWidget {
             ),
             _divider(theme),
           ],
-          if (onToggleButton != null) _buttonToggle(theme),
         ],
-      ),
-    );
-  }
-
-  /// Set apart from the feature list: it acts on Phantom's own chrome rather
-  /// than opening a debug module.
-  Widget _buttonToggle(PhantomTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: _row(
-        theme: theme,
-        title: buttonHidden ? 'Show floating button' : 'Hide floating button',
-        // The gesture that reopens Phantom leaves no trace on screen, so the
-        // row is where it gets taught.
-        subtitle: buttonHidden
-            ? 'It will reappear where it was.'
-            : 'Shake the device to reopen Phantom. Restarting the app also '
-                  'brings it back.',
-        icon: buttonHidden
-            ? Icons.visibility_outlined
-            : Icons.visibility_off_outlined,
-        onTap: onToggleButton!,
-        showChevron: false,
       ),
     );
   }
