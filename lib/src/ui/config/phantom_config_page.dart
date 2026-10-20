@@ -361,68 +361,71 @@ class _PhantomConfigPageState extends State<PhantomConfigPage> {
           onTap: () {
             showModalBottomSheet(
               context: context,
+              isScrollControlled: true,
               backgroundColor: theme.background,
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
               builder: (ctx) => SafeArea(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        entry.label,
-                        style: TextStyle(
-                          color: theme.onBackground,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          entry.label,
+                          style: TextStyle(
+                            color: theme.onBackground,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    ...entry.options.map((option) {
-                      final isSelected = selected == option;
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
-                          _setOverride(entry.key, option);
-                          Navigator.pop(ctx);
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          color: isSelected
-                              ? theme.surfaceVariant
-                              : Colors.transparent,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  option,
-                                  style: TextStyle(
-                                    color: theme.onBackground,
-                                    fontSize: 14,
-                                    fontWeight: isSelected
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
+                      ...entry.options.map((option) {
+                        final isSelected = selected == option;
+                        return GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            _setOverride(entry.key, option);
+                            Navigator.pop(ctx);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            color: isSelected
+                                ? theme.surfaceVariant
+                                : Colors.transparent,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    option,
+                                    style: TextStyle(
+                                      color: theme.onBackground,
+                                      fontSize: 14,
+                                      fontWeight: isSelected
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              if (isSelected)
-                                Icon(
-                                  Icons.check,
-                                  color: theme.success,
-                                  size: 18,
-                                ),
-                            ],
+                                if (isSelected)
+                                  Icon(
+                                    Icons.check,
+                                    color: theme.success,
+                                    size: 18,
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 16),
-                  ],
+                        );
+                      }),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
             );
