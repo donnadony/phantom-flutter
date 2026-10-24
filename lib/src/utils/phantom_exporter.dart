@@ -22,6 +22,7 @@ class PhantomExporter {
         'message': item.message,
         'timestamp': item.createdAt.toIso8601String(),
         if (item.tag != null) 'tag': item.tag,
+        if (item.details != null) 'details': item.details,
       };
     }).toList();
 

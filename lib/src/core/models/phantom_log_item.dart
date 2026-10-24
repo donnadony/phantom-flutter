@@ -44,11 +44,17 @@ class PhantomLogItem {
   final String? tag;
   final DateTime createdAt;
 
+  /// Structured payload behind the message — an analytics event's properties,
+  /// a request's context. Shown in full on the log's detail page, which the
+  /// row opens only when this is set.
+  final String? details;
+
   const PhantomLogItem({
     required this.id,
     required this.level,
     required this.message,
     this.tag,
     required this.createdAt,
+    this.details,
   });
 }

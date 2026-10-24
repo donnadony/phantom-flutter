@@ -30,7 +30,7 @@ A cross-platform debug toolkit for Flutter apps. Inspect logs, network requests,
 
 ## Features
 
-- **Logs** — App-level logging with levels (info, warning, error) and tag filtering
+- **Logs** — App-level logging with levels (info, warning, error) and tag filtering; a log can carry a `details` payload, opened in full as a JSON tree
 - **Network Inspector** — Capture and inspect HTTP requests/responses with JSON tree viewer
 - **cURL Export** — Copy any network request as a ready-to-paste cURL command
 - **Mock Services** — Intercept network requests and return mock responses at runtime

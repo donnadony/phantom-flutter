@@ -1,3 +1,13 @@
+## 0.0.9
+
+### Added
+
+* **A log can carry its payload, and the row opens it.** `Phantom.log`, `logInfo`, `logWarning` and `logError` take an optional `details`: a `Map` or a `List` is stored as indented JSON, a value JSON cannot encode inside it is written as its text, and anything else is stored as its `toString()`. A row with details shows a chevron and opens a detail page — level, tag, time to the millisecond, the message, and the payload as the same JSON tree the Network inspector uses, with a button to copy it.
+
+  The list still shows the message in three lines, which is what made a payload unreadable before: an analytics event with a handful of properties was cut off right where the properties began. Now the row names the event and the detail page holds what was sent.
+
+  Search matches inside the details, and the logs export carries them under `details`. A log without details looks and behaves as it did.
+
 ## 0.0.8
 
 ### Removed

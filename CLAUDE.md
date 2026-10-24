@@ -94,6 +94,14 @@ Phantom.logError('Request failed', tag: 'Network');
 
 // Or with an explicit level:
 Phantom.log(PhantomLogLevel.info, 'User logged in', tag: 'Auth');
+
+// With a payload: the row gets a chevron and opens a detail page that shows
+// a Map or List as a JSON tree, anything else as text, with a copy button.
+Phantom.logInfo(
+  'ui_interaction',
+  tag: 'Analytics',
+  details: {'ui_label': 'continue', 'ui_hierarchy': 'home'},
+);
 ```
 
 ### Step 6 (optional): Register configs
@@ -140,10 +148,10 @@ Phantom.addCustomEntry(title:, icon:, action:);
 Phantom.clearCustomEntries();
 
 // Logging
-Phantom.log(PhantomLogLevel.info/warning/error, message, tag: tag);
-Phantom.logInfo(message, tag:);
-Phantom.logWarning(message, tag:);
-Phantom.logError(message, tag:);
+Phantom.log(PhantomLogLevel.info/warning/error, message, tag: tag, details:);
+Phantom.logInfo(message, tag:, details:);
+Phantom.logWarning(message, tag:, details:);
+Phantom.logError(message, tag:, details:);
 
 // Network
 Phantom.logRequest(method:, url:, headers:, body:);
