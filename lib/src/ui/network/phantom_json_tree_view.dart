@@ -7,7 +7,16 @@ import '../../theme/phantom_theme.dart';
 class PhantomJsonTreeView extends StatelessWidget {
   final String jsonString;
 
-  const PhantomJsonTreeView({super.key, required this.jsonString});
+  /// Whether a long leaf value is cut to three lines. The Network inspector
+  /// keeps it on so a large body stays scannable; the log detail page turns
+  /// it off, since showing the whole payload is its only job.
+  final bool truncateLeaves;
+
+  const PhantomJsonTreeView({
+    super.key,
+    required this.jsonString,
+    this.truncateLeaves = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +49,7 @@ class PhantomJsonTreeView extends StatelessWidget {
             keyName: e.key.toString(),
             value: e.value,
             theme: theme,
+            truncateLeaves: truncateLeaves,
           );
         }).toList(),
       );
@@ -52,6 +62,7 @@ class PhantomJsonTreeView extends StatelessWidget {
             keyName: '[${e.key}]',
             value: e.value,
             theme: theme,
+            truncateLeaves: truncateLeaves,
           );
         }).toList(),
       );
@@ -71,11 +82,13 @@ class _JsonNodeView extends StatefulWidget {
   final String keyName;
   final dynamic value;
   final PhantomTheme theme;
+  final bool truncateLeaves;
 
   const _JsonNodeView({
     required this.keyName,
     required this.value,
     required this.theme,
+    required this.truncateLeaves,
   });
 
   @override
@@ -157,6 +170,7 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
                   keyName: e.key,
                   value: e.value,
                   theme: theme,
+                  truncateLeaves: widget.truncateLeaves,
                 );
               }).toList(),
             ),
@@ -226,6 +240,7 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
                   keyName: '[${e.key}]',
                   value: e.value,
                   theme: theme,
+                  truncateLeaves: widget.truncateLeaves,
                 );
               }).toList(),
             ),
@@ -269,8 +284,8 @@ class _JsonNodeViewState extends State<_JsonNodeView> {
                 fontSize: 12,
                 fontFamily: 'monospace',
               ),
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
+              maxLines: widget.truncateLeaves ? 3 : null,
+              overflow: widget.truncateLeaves ? TextOverflow.ellipsis : null,
             ),
           ),
         ],

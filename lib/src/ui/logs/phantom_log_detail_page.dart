@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,8 +7,8 @@ import '../../core/models/phantom_log_item.dart';
 import '../../theme/phantom_theme.dart';
 import '../network/phantom_json_tree_view.dart';
 
-/// A log's message and its [PhantomLogItem.details] in full: a JSON payload
-/// as a tree, anything else as plain text.
+/// A log's message and its [PhantomLogItem.details] in full: a payload that
+/// is valid JSON as a tree, with keys sorted, anything else as plain text.
 class PhantomLogDetailPage extends StatefulWidget {
   final PhantomLogItem item;
 
@@ -18,6 +20,13 @@ class PhantomLogDetailPage extends StatefulWidget {
 
 class _PhantomLogDetailPageState extends State<PhantomLogDetailPage> {
   bool _copied = false;
+  Timer? _copiedReset;
+
+  @override
+  void dispose() {
+    _copiedReset?.cancel();
+    super.dispose();
+  }
 
   PhantomLogItem get _item => widget.item;
 
@@ -43,7 +52,12 @@ class _PhantomLogDetailPageState extends State<PhantomLogDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(theme),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.sizeOf(context).height * 0.25,
+              ),
+              child: SingleChildScrollView(child: _buildHeader(theme)),
+            ),
             const SizedBox(height: 12),
             Expanded(child: _buildDetails(theme)),
             const SizedBox(height: 12),
@@ -98,7 +112,10 @@ class _PhantomLogDetailPageState extends State<PhantomLogDetailPage> {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: theme.outlineVariant),
       ),
-      child: PhantomJsonTreeView(jsonString: _item.details ?? ''),
+      child: PhantomJsonTreeView(
+        jsonString: _item.details ?? '',
+        truncateLeaves: false,
+      ),
     );
   }
 
@@ -137,7 +154,8 @@ class _PhantomLogDetailPageState extends State<PhantomLogDetailPage> {
   void _copy() {
     Clipboard.setData(ClipboardData(text: _item.details ?? ''));
     setState(() => _copied = true);
-    Future.delayed(const Duration(seconds: 2), () {
+    _copiedReset?.cancel();
+    _copiedReset = Timer(const Duration(seconds: 2), () {
       if (mounted) setState(() => _copied = false);
     });
   }

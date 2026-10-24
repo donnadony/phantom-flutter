@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:phantom_flutter/phantom_flutter.dart';
 import 'package:phantom_flutter/src/ui/logs/phantom_log_detail_page.dart';
 import 'package:phantom_flutter/src/ui/logs/phantom_logs_page.dart';
+import 'package:phantom_flutter/src/ui/network/phantom_json_tree_view.dart';
 import 'package:phantom_flutter/src/utils/phantom_exporter.dart';
 
 void main() {
@@ -60,8 +61,42 @@ void main() {
               as Map<String, dynamic>;
       final entries = (payload['entries'] as List).cast<Map<String, dynamic>>();
 
-      expect(entries.first['details'], '{\n  "a": 1\n}');
+      expect(entries.first['details'], {'a': 1});
       expect(entries.last.containsKey('details'), isFalse);
+    });
+
+    test('the export keeps a details string that is not JSON as text', () {
+      Phantom.logInfo('event', details: 'plain text');
+
+      final payload =
+          jsonDecode(PhantomExporter.encodeLogs(PhantomLogger.instance.logs))
+              as Map<String, dynamic>;
+
+      expect((payload['entries'] as List).single['details'], 'plain text');
+    });
+
+    test('an object with toJson is written through it', () {
+      Phantom.logInfo('event', details: {'entity': const _Entity('x')});
+      expect(jsonDecode(latest().details ?? ''), {
+        'entity': {'id': 'x'},
+      });
+
+      Phantom.logInfo('event', details: const _Entity('y'));
+      expect(jsonDecode(latest().details ?? ''), {'id': 'y'});
+    });
+
+    test('a payload that cannot be encoded never throws into the caller', () {
+      final cyclic = <String, Object?>{};
+      cyclic['self'] = cyclic;
+
+      expect(() => Phantom.logInfo('cycle', details: cyclic), returnsNormally);
+      expect(latest().details, startsWith('<details could not be encoded'));
+
+      expect(
+        () => Phantom.logInfo('bad', details: _Unprintable()),
+        returnsNormally,
+      );
+      expect(latest().details, startsWith('<details could not be encoded'));
     });
   });
 
@@ -111,8 +146,74 @@ void main() {
     });
   });
 
+  group('the detail page', () {
+    Widget page() => MaterialApp(home: PhantomLogDetailPage(item: latest()));
+
+    testWidgets('a string that is valid JSON is drawn as a tree', (
+      tester,
+    ) async {
+      Phantom.logInfo('event', details: '{"ui_label": "continuar"}');
+      await tester.pumpWidget(page());
+
+      expect(find.text('ui_label'), findsOneWidget);
+      expect(find.text('"continuar"'), findsOneWidget);
+    });
+
+    testWidgets('a long value is shown whole', (tester) async {
+      final long = List.filled(400, 'x').join();
+      Phantom.logInfo('event', details: {'url': long});
+      await tester.pumpWidget(page());
+
+      final leaf = tester.widget<Text>(find.text('"$long"'));
+      expect(leaf.maxLines, isNull);
+      expect(leaf.overflow, isNull);
+    });
+
+    testWidgets('a long message does not push the details off the page', (
+      tester,
+    ) async {
+      Phantom.logInfo(List.filled(200, 'line').join('\n'), details: {'a': 1});
+      await tester.pumpWidget(page());
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Copy details'), findsOneWidget);
+      expect(
+        tester.getSize(find.byType(PhantomJsonTreeView)).height,
+        greaterThan(100),
+      );
+    });
+
+    testWidgets('the panel theme reaches the page the row opens', (
+      tester,
+    ) async {
+      Phantom.logInfo('event', details: {'a': 1});
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: PhantomThemeProvider(theme: _custom, child: PhantomLogsPage()),
+        ),
+      );
+
+      await tester.tap(find.text('event'));
+      await tester.pumpAndSettle();
+
+      final scaffold = tester.widget<Scaffold>(
+        find.descendant(
+          of: find.byType(PhantomLogDetailPage),
+          matching: find.byType(Scaffold),
+        ),
+      );
+      expect(scaffold.backgroundColor, _custom.background);
+    });
+  });
+
   testWidgets('the detail page copies the details', (tester) async {
     Phantom.logInfo('event', details: {'a': 1});
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
     String? copied;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -137,3 +238,43 @@ void main() {
     expect(find.text('Copy details'), findsOneWidget);
   });
 }
+
+class _Entity {
+  const _Entity(this.id);
+
+  final String id;
+
+  Map<String, Object?> toJson() => {'id': id};
+}
+
+class _Unprintable {
+  @override
+  String toString() => throw StateError('no text');
+}
+
+const _custom = PhantomTheme(
+  background: Color(0xFF123456),
+  surface: Color(0xFF1C2540),
+  surfaceVariant: Color(0xFF283050),
+  onBackground: Color(0xFFE4ECFF),
+  onBackgroundVariant: Color(0xFFA8B4D0),
+  onPrimary: Color(0xFF3C0091),
+  primary: Color(0xFFD0BCFF),
+  primaryContainer: Color(0xFFA078FF),
+  info: Color(0xFF5DE6FF),
+  warning: Color(0xFFFFB869),
+  error: Color(0xFFFFB4AB),
+  success: Color(0xFF5DE6FF),
+  outline: Color(0xFF958EA0),
+  outlineVariant: Color(0xFF5A5570),
+  tint: Color(0xFFA078FF),
+  inputBackground: Color(0xFF0F1829),
+  httpGet: Color(0xFF5DE6FF),
+  httpPost: Color(0xFFD0BCFF),
+  httpPut: Color(0xFFFFB869),
+  httpDelete: Color(0xFFFFB4AB),
+  jsonString: Color(0xFF5DE6FF),
+  jsonNumber: Color(0xFFD0BCFF),
+  jsonBoolean: Color(0xFFFFB869),
+  jsonNull: Color(0xFF958EA0),
+);

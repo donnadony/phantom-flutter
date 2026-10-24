@@ -63,8 +63,9 @@ class Phantom {
 
   // MARK: - App Logging
 
-  /// [details] is the payload the log's detail page shows in full: a map or a
-  /// list is rendered as a JSON tree, anything else as text.
+  /// [details] is the payload the log's detail page shows in full. A map, a
+  /// list, an object with `toJson()` or a string that is valid JSON is shown
+  /// as a JSON tree with its keys sorted; anything else as text.
   static void log(
     PhantomLogLevel level,
     String message, {

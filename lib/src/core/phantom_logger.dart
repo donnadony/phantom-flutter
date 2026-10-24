@@ -12,8 +12,10 @@ class PhantomLogger extends ChangeNotifier {
 
   List<PhantomLogItem> get logs => List.unmodifiable(_logs);
 
-  /// [details] may be a map or a list, which is stored as indented JSON, or
-  /// any other value, which is stored as its `toString()`.
+  /// [details] may be a map, a list or an object with `toJson()`, stored as
+  /// indented JSON; a string, stored as given; or any other value, stored as
+  /// its `toString()`. A payload that cannot be encoded — a cycle, a throwing
+  /// `toString()` — is replaced by a note saying so, never thrown.
   void log(
     PhantomLogLevel level,
     String message, {
@@ -44,13 +46,29 @@ class PhantomLogger extends ChangeNotifier {
   static const _json = JsonEncoder.withIndent('  ', _encodable);
 
   static String? _encodeDetails(Object? details) {
-    if (details == null) return null;
-    if (details is String) return details;
-    if (details is Map || details is List) return _json.convert(details);
-    return details.toString();
+    if (details == null || details is String) return details as String?;
+    try {
+      final json = details is Map || details is List
+          ? details
+          : _toJson(details);
+      if (json is Map || json is List) return _json.convert(json);
+      return details.toString();
+    } catch (error) {
+      return '<details could not be encoded: $error>';
+    }
   }
 
-  static Object? _encodable(Object? value) => value.toString();
+  /// What `jsonEncode` would use for [value]: its `toJson()` when it has one,
+  /// otherwise its text.
+  static Object? _encodable(Object? value) => _toJson(value) ?? '$value';
+
+  static Object? _toJson(Object? value) {
+    try {
+      return (value as dynamic).toJson();
+    } on NoSuchMethodError {
+      return null;
+    }
+  }
 
   void clearAll() {
     _logs.clear();

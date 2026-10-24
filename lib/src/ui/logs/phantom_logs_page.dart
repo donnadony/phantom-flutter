@@ -233,20 +233,24 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
               ),
               if (item.tag != null) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.surfaceVariant,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    item.tag!,
-                    style: TextStyle(
-                      color: theme.onBackgroundVariant,
-                      fontSize: 10,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      item.tag!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: theme.onBackgroundVariant,
+                        fontSize: 10,
+                      ),
                     ),
                   ),
                 ),

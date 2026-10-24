@@ -95,8 +95,9 @@ Phantom.logError('Request failed', tag: 'Network');
 // Or with an explicit level:
 Phantom.log(PhantomLogLevel.info, 'User logged in', tag: 'Auth');
 
-// With a payload: the row gets a chevron and opens a detail page that shows
-// a Map or List as a JSON tree, anything else as text, with a copy button.
+// With a payload: the row gets a chevron and opens a detail page with a copy
+// button. A Map, a List or an object with toJson() is shown as a JSON tree
+// (keys sorted), and so is a String that is valid JSON; anything else as text.
 Phantom.logInfo(
   'ui_interaction',
   tag: 'Analytics',
