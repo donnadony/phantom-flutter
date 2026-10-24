@@ -4,6 +4,7 @@ import '../../core/models/phantom_log_item.dart';
 import '../../core/phantom_logger.dart';
 import '../../theme/phantom_theme.dart';
 import '../../utils/phantom_exporter.dart';
+import 'phantom_log_detail_page.dart';
 
 class PhantomLogsPage extends StatefulWidget {
   const PhantomLogsPage({super.key});
@@ -40,7 +41,8 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
       final query = _searchText.toLowerCase();
       list = list.where((l) {
         return l.message.toLowerCase().contains(query) ||
-            (l.tag?.toLowerCase().contains(query) ?? false);
+            (l.tag?.toLowerCase().contains(query) ?? false) ||
+            (l.details?.toLowerCase().contains(query) ?? false);
       }).toList();
     }
     return list;
@@ -190,6 +192,23 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
   }
 
   Widget _logRow(PhantomLogItem item, PhantomTheme theme) {
+    final row = _logRowBody(item, theme);
+    if (item.details == null) return row;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PhantomThemeProvider(
+            theme: theme,
+            child: PhantomLogDetailPage(item: item),
+          ),
+        ),
+      ),
+      child: row,
+    );
+  }
+
+  Widget _logRowBody(PhantomLogItem item, PhantomTheme theme) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -214,20 +233,24 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
               ),
               if (item.tag != null) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.surfaceVariant,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    item.tag!,
-                    style: TextStyle(
-                      color: theme.onBackgroundVariant,
-                      fontSize: 10,
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 1,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.surfaceVariant,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      item.tag!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: theme.onBackgroundVariant,
+                        fontSize: 10,
+                      ),
                     ),
                   ),
                 ),
@@ -240,6 +263,14 @@ class _PhantomLogsPageState extends State<PhantomLogsPage> {
                   fontSize: 11,
                 ),
               ),
+              if (item.details != null) ...[
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.onBackgroundVariant,
+                  size: 16,
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 4),

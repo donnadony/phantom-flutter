@@ -22,10 +22,21 @@ class PhantomExporter {
         'message': item.message,
         'timestamp': item.createdAt.toIso8601String(),
         if (item.tag != null) 'tag': item.tag,
+        if (item.details case final details?) 'details': _decoded(details),
       };
     }).toList();
 
     return _encodePayload(type: 'phantom_logs', entries: entries);
+  }
+
+  /// Details that are JSON go out as JSON, so a reader decodes the export
+  /// once rather than once per entry.
+  static Object _decoded(String details) {
+    try {
+      return jsonDecode(details) as Object;
+    } on FormatException {
+      return details;
+    }
   }
 
   static String encodeNetwork(List<PhantomNetworkItem> logs) {

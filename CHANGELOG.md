@@ -1,3 +1,19 @@
+## 0.0.9
+
+### Added
+
+* **A log can carry its payload, and the row opens it.** `Phantom.log`, `logInfo`, `logWarning` and `logError` take an optional `details`. A `Map`, a `List` or an object with `toJson()` is stored as indented JSON, with any value inside that JSON cannot encode written through its `toJson()` or as its text; a `String` is kept as given; anything else is stored as its `toString()`. A payload that cannot be encoded at all — a cycle, a throwing `toString()` — becomes a note saying so: logging never throws into the caller.
+
+  A row with details shows a chevron and opens a detail page — level, tag, time to the millisecond, the message, and the payload as the same JSON tree the Network inspector uses, keys sorted, with a button to copy it. A string payload that is valid JSON is drawn as a tree too. On this page no value is cut short; the Network inspector still trims long leaves to three lines.
+
+  The list still shows the message in three lines, which is what made a payload unreadable before: an analytics event with a handful of properties was cut off right where the properties began. Now the row names the event and the detail page holds what was sent.
+
+  Search matches inside the details, and the logs export carries them under `details` — as JSON when they are JSON, so a reader decodes the file once. A log without details looks and behaves as it did.
+
+### Fixed
+
+* **A long tag no longer overflows a log row**; it is cut with an ellipsis.
+
 ## 0.0.8
 
 ### Removed

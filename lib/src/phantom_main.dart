@@ -63,18 +63,26 @@ class Phantom {
 
   // MARK: - App Logging
 
-  static void log(PhantomLogLevel level, String message, {String? tag}) {
-    PhantomLogger.instance.log(level, message, tag: tag);
+  /// [details] is the payload the log's detail page shows in full. A map, a
+  /// list, an object with `toJson()` or a string that is valid JSON is shown
+  /// as a JSON tree with its keys sorted; anything else as text.
+  static void log(
+    PhantomLogLevel level,
+    String message, {
+    String? tag,
+    Object? details,
+  }) {
+    PhantomLogger.instance.log(level, message, tag: tag, details: details);
   }
 
-  static void logInfo(String message, {String? tag}) =>
-      PhantomLogger.instance.info(message, tag: tag);
+  static void logInfo(String message, {String? tag, Object? details}) =>
+      PhantomLogger.instance.info(message, tag: tag, details: details);
 
-  static void logWarning(String message, {String? tag}) =>
-      PhantomLogger.instance.warn(message, tag: tag);
+  static void logWarning(String message, {String? tag, Object? details}) =>
+      PhantomLogger.instance.warn(message, tag: tag, details: details);
 
-  static void logError(String message, {String? tag}) =>
-      PhantomLogger.instance.error(message, tag: tag);
+  static void logError(String message, {String? tag, Object? details}) =>
+      PhantomLogger.instance.error(message, tag: tag, details: details);
 
   // MARK: - Network Logging
 
